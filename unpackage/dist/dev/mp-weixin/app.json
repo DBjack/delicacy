@@ -1,0 +1,74 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/publish/publish",
+    "pages/discover/discover",
+    "pages/profile/profile",
+    "pages/auth/login",
+    "pages/user/edit-profile",
+    "pages/draft/index",
+    "pages/user/followers",
+    "pages/user/following",
+    "pages/search/index",
+    "pages/user/user",
+    "pages/user/edit-profile"
+  ],
+  "subPackages": [
+    {
+      "root": "packagePost",
+      "pages": [
+        "pages/detail",
+        "pages/list"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "美食圈",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF6B6B",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/index.png",
+        "selectedIconPath": "static/tabbar/index-active.png"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "发现",
+        "iconPath": "static/tabbar/discover.png",
+        "selectedIconPath": "static/tabbar/discover-active.png"
+      },
+      {
+        "pagePath": "pages/publish/publish",
+        "text": "发布",
+        "iconPath": "static/tabbar/publish.png",
+        "selectedIconPath": "static/tabbar/publish-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "static/tabbar/profile.png",
+        "selectedIconPath": "static/tabbar/profile-active.png"
+      }
+    ]
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    },
+    "scope.userInfo": {
+      "desc": "用于完善用户资料"
+    }
+  },
+  "usingComponents": {}
+}

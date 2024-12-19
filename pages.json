@@ -1,0 +1,143 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "美食圈"
+			}
+		},
+		{
+			"path": "pages/publish/publish",
+			"style": {
+				"navigationBarTitleText": "发布美食"
+			}
+		},
+		{
+			"path": "pages/discover/discover",
+			"style": {
+				"navigationBarTitleText": "发现"
+			}
+		},
+		{
+			"path": "pages/profile/profile",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/user/edit-profile",
+			"style": {
+				"navigationBarTitleText": "编辑资料"
+			}
+		},
+		{
+			"path": "pages/draft/index",
+			"style": {
+				"navigationBarTitleText": "草稿箱"
+			}
+		},
+		{
+			"path": "pages/user/followers",
+			"style": {
+				"navigationBarTitleText": "粉丝列表"
+			}
+		},
+		{
+			"path": "pages/user/following",
+			"style": {
+				"navigationBarTitleText": "关注列表"
+			}
+		},
+		{
+			"path": "pages/search/index",
+			"style": {
+				"navigationBarTitleText": "搜索",
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/user/user",
+			"style": {
+				"navigationBarTitleText": "用户主页"
+			}
+		},
+		{
+			"path": "pages/user/edit-profile",
+			"style": {
+				"navigationBarTitleText": "编辑资料"
+			}
+		}
+	],
+	"subPackages": [
+		{
+			"root": "packagePost",
+			"pages": [
+				{
+					"path": "pages/detail",
+					"style": {
+						"navigationBarTitleText": "美食详情"
+					}
+				},
+				{
+					"path": "pages/list",
+					"style": {
+						"navigationBarTitleText": "帖子列表",
+						"enablePullDownRefresh": true
+					}
+				}
+			]
+		}
+	],
+	"tabBar": {
+		"color": "#999999",
+		"selectedColor": "#FF6B6B",
+		"backgroundColor": "#FFFFFF",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/index.png",
+				"selectedIconPath": "static/tabbar/index-active.png"
+			},
+			{
+				"pagePath": "pages/discover/discover",
+				"text": "发现",
+				"iconPath": "static/tabbar/discover.png",
+				"selectedIconPath": "static/tabbar/discover-active.png"
+			},
+			{
+				"pagePath": "pages/publish/publish",
+				"text": "发布",
+				"iconPath": "static/tabbar/publish.png",
+				"selectedIconPath": "static/tabbar/publish-active.png"
+			},
+			{
+				"pagePath": "pages/profile/profile",
+				"text": "我的",
+				"iconPath": "static/tabbar/profile.png",
+				"selectedIconPath": "static/tabbar/profile-active.png"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "美食圈",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {},
+	"permission": {
+		"scope": {
+			"userInfo": {
+				"desc": "您的用户信息将用于小程序登录"
+			}
+		}
+	}
+}

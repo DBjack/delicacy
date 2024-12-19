@@ -1,0 +1,58 @@
+@font-face {
+  font-family: "iconfont";
+  src: url('//at.alicdn.com/t/font_3237405_q1z0xr5qr6.woff2?t=1647424459746') format('woff2'),
+       url('//at.alicdn.com/t/font_3237405_q1z0xr5qr6.woff?t=1647424459746') format('woff'),
+       url('//at.alicdn.com/t/font_3237405_q1z0xr5qr6.ttf?t=1647424459746') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-delete:before {
+  content: "\e6b4";
+}
+
+.icon-camera:before {
+  content: "\e6ac";
+}
+
+.icon-draft:before {
+  content: "\e6b2";
+}
+
+.icon-home:before {
+  content: "\e6b8";
+}
+
+.icon-dessert:before {
+  content: "\e6ba";
+}
+
+.icon-baking:before {
+  content: "\e6bc";
+}
+
+.icon-drink:before {
+  content: "\e6be";
+}
+
+.icon-snack:before {
+  content: "\e6c0";
+}
+
+.icon-other:before {
+  content: "\e6c2";
+}
+
+.icon-arrow-right:before {
+  content: "\e6b6";
+}
+
+.icon-save:before {
+  content: "\e6b0";
+} 

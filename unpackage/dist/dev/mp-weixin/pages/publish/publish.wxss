@@ -1,0 +1,286 @@
+@charset "UTF-8";
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.container {
+  min-height: 100vh;
+  background: #f8f8f8;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: #f0f0f0;
+  z-index: 100;
+}
+.progress-bar .progress {
+  height: 100%;
+  background: #ff6b6b;
+  transition: width 0.3s ease;
+}
+.content {
+  padding: 30rpx;
+}
+.form-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+.title-input {
+  font-size: 32rpx;
+  font-weight: 500;
+  height: 88rpx;
+  line-height: 88rpx;
+}
+.title-input::-webkit-input-placeholder {
+  color: #999;
+  font-weight: normal;
+}
+.title-input::placeholder {
+  color: #999;
+  font-weight: normal;
+}
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -8rpx;
+}
+.image-list .image-item {
+  position: relative;
+  width: calc(33.33% - 16rpx);
+  margin: 8rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background: #f8f8f8;
+}
+.image-list .image-item::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+.image-list .image-item image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-list .image-item .mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.image-list .image-item .mask .delete-btn {
+  position: absolute;
+  right: 8rpx;
+  top: 8rpx;
+  width: 44rpx;
+  height: 44rpx;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image-list .image-item .mask .delete-btn .icon-delete {
+  color: #fff;
+  font-size: 24rpx;
+}
+.image-list .image-item .mask .order-num {
+  position: absolute;
+  left: 8rpx;
+  bottom: 8rpx;
+  font-size: 24rpx;
+  color: #fff;
+  text-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+.image-list .image-item:hover .mask {
+  opacity: 1;
+}
+.image-list .upload-btn {
+  position: relative;
+  width: calc(33.33% - 16rpx);
+  margin: 8rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.image-list .upload-btn::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+.image-list .upload-btn .icon-camera {
+  font-size: 48rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+.image-list .upload-btn .tip {
+  font-size: 24rpx;
+  color: #999;
+}
+.description-input {
+  width: 100%;
+  min-height: 200rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+  padding: 0;
+}
+.section-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -8rpx;
+}
+.category-list .category-item {
+  width: calc(33.33% - 16rpx);
+  height: 88rpx;
+  margin: 8rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+.category-list .category-item .iconfont {
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 4rpx;
+}
+.category-list .category-item text {
+  font-size: 24rpx;
+  color: #666;
+}
+.category-list .category-item.active {
+  background: #ff6b6b;
+  -webkit-transform: translateY(-2rpx);
+          transform: translateY(-2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+}
+.category-list .category-item.active .iconfont,
+.category-list .category-item.active text {
+  color: #fff;
+}
+.tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -8rpx 16rpx;
+}
+.tags-wrapper .tag {
+  margin: 8rpx;
+  padding: 12rpx 24rpx;
+  background: #f8f8f8;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #666;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s;
+}
+.tags-wrapper .tag.active {
+  background: #ff6b6b;
+  color: #fff;
+  -webkit-transform: translateY(-2rpx);
+          transform: translateY(-2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+}
+.tags-wrapper .tag .tag-icon {
+  margin-right: 6rpx;
+  font-size: 24rpx;
+}
+.count {
+  font-size: 24rpx;
+  color: #999;
+  text-align: right;
+  margin-top: 8rpx;
+  display: block;
+}
+.tip {
+  font-size: 24rpx;
+  color: #999;
+}
+.button-group {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -2rpx 20rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 20rpx;
+}
+.button-group button {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  text-align: center;
+}
+.button-group button::after {
+  border: none;
+}
+.button-group .draft-btn {
+  background: #f8f8f8;
+  color: #666;
+}
+.button-group .submit-btn {
+  background: #ff6b6b;
+  color: #fff;
+}
+.button-group .submit-btn.disabled {
+  background: #ffb3b3;
+}
+.button-group .submit-btn:not(.disabled):active {
+  -webkit-transform: translateY(2rpx);
+          transform: translateY(2rpx);
+  opacity: 0.9;
+}
+

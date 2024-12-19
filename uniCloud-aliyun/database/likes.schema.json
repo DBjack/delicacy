@@ -1,0 +1,37 @@
+{
+  "bsonType": "object",
+  "required": ["user_id", "post_id", "type"],
+  "permission": {
+    "read": true,
+    "create": "auth.uid != null",
+    "update": false,
+    "delete": "doc.user_id == auth.uid"
+  },
+  "properties": {
+    "_id": {
+      "description": "ID，系统自动生成"
+    },
+    "user_id": {
+      "bsonType": "string",
+      "description": "用户ID",
+      "foreignKey": "users._id"
+    },
+    "post_id": {
+      "bsonType": "string",
+      "description": "帖子ID",
+      "foreignKey": "posts._id"
+    },
+    "type": {
+      "bsonType": "string",
+      "description": "类型：like-点赞 collect-收藏",
+      "enum": ["like", "collect"]
+    },
+    "create_date": {
+      "bsonType": "timestamp",
+      "description": "创建时间",
+      "defaultValue": {
+        "$env": "now"
+      }
+    }
+  }
+} 
