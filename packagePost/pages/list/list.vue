@@ -1,6 +1,6 @@
 <template>
   <view class="container">
-    <!-- <view class="post-list">
+    <view class="post-list">
       <view
         v-for="item in posts"
         :key="item._id"
@@ -10,44 +10,52 @@
         <view class="author">
           <image
             class="avatar"
-            :src="item.author ? item.author.avatar : defaultAvatar"
+            :src="
+              item.author && item.author.avatar
+                ? item.author.avatar
+                : '/static/images/default-avatar.png'
+            "
             mode="aspectFill"
           />
           <text class="nickname">{{
-            item.author ? item.author.nickname : "美食家"
+            item.author && item.author.nickname
+              ? item.author.nickname
+              : "美食家"
           }}</text>
           <text class="time">{{ formatTime(item.create_date) }}</text>
         </view>
         <view class="content">
           <text class="title">{{ item.title }}</text>
           <text class="description">{{ item.description }}</text>
-          <view class="images" v-if="item.images?.length">
+          <view class="images" v-if="item.images && item.images.length">
             <image
-              v-for="(image, index) in item.images.slice(0, 3)"
+              v-for="(image, index) in item.images"
               :key="index"
               :src="image"
               mode="aspectFill"
+              class="image"
               @tap.stop="previewImage(item.images, index)"
             />
           </view>
         </view>
-        <view class="actions">
-          <view class="action-item">
-            <text class="iconfont icon-like"></text>
-            <text class="count">{{ item.likeCount || 0 }}</text>
-          </view>
-          <view class="action-item">
-            <text class="iconfont icon-star"></text>
-            <text class="count">{{ item.collectCount || 0 }}</text>
-          </view>
-          <view class="action-item">
-            <text class="iconfont icon-comment"></text>
-            <text class="count">{{ item.commentCount || 0 }}</text>
+        <view class="footer">
+          <view class="stats">
+            <view class="stat">
+              <text class="count">{{ formatNumber(item.likeCount) }}</text>
+              <text class="label">赞</text>
+            </view>
+            <view class="stat">
+              <text class="count">{{ formatNumber(item.commentCount) }}</text>
+              <text class="label">评论</text>
+            </view>
+            <view class="stat">
+              <text class="count">{{ formatNumber(item.collectCount) }}</text>
+              <text class="label">收藏</text>
+            </view>
           </view>
         </view>
       </view>
-    </view> -->
-
+    </view>
     <uni-load-more :status="loadMoreStatus"></uni-load-more>
   </view>
 </template>
@@ -56,13 +64,12 @@
 export default {
   data() {
     return {
-      tag: "",
       posts: [],
       page: 1,
       pageSize: 10,
       loadMoreStatus: "more",
       isLoading: false,
-      defaultAvatar: "/static/images/default-avatar.jpg",
+      tag: "",
     };
   },
 
@@ -72,8 +79,8 @@ export default {
       uni.setNavigationBarTitle({
         title: `#${this.tag}`,
       });
-      this.loadData();
     }
+    this.loadPosts();
   },
 
   onPullDownRefresh() {
@@ -85,13 +92,13 @@ export default {
   },
 
   methods: {
-    async loadData() {
+    async loadPosts() {
       if (this.isLoading) return;
       this.isLoading = true;
 
       try {
         const res = await uniCloud.callFunction({
-          name: "post",
+          name: "posts",
           data: {
             action: "getPostsByTag",
             params: {
@@ -115,9 +122,9 @@ export default {
           throw new Error(res.result.msg);
         }
       } catch (error) {
-        console.error("加载帖子失败:", error);
+        console.error("获取帖子列表失败:", error);
         uni.showToast({
-          title: "加载失败",
+          title: "获取帖子列表失败",
           icon: "none",
         });
       } finally {
@@ -128,42 +135,13 @@ export default {
 
     refreshData() {
       this.page = 1;
-      this.loadData();
+      this.loadPosts();
     },
 
     loadMore() {
       if (this.loadMoreStatus === "noMore") return;
       this.page++;
-      this.loadData();
-    },
-
-    formatTime(date) {
-      if (!date) return "";
-      date = new Date(date);
-      const now = new Date();
-      const diff = now - date;
-      const minute = 1000 * 60;
-      const hour = minute * 60;
-      const day = hour * 24;
-
-      if (diff < minute) {
-        return "刚刚";
-      } else if (diff < hour) {
-        return Math.floor(diff / minute) + "分钟前";
-      } else if (diff < day) {
-        return Math.floor(diff / hour) + "小时前";
-      } else if (diff < day * 30) {
-        return Math.floor(diff / day) + "天前";
-      } else {
-        return `${date.getMonth() + 1}月${date.getDate()}日`;
-      }
-    },
-
-    previewImage(images, index) {
-      uni.previewImage({
-        urls: images,
-        current: index,
-      });
+      this.loadPosts();
     },
 
     goToDetail(id) {
@@ -171,21 +149,67 @@ export default {
         url: `/packagePost/pages/detail/detail?id=${id}`,
       });
     },
+
+    previewImage(images, current) {
+      uni.previewImage({
+        urls: images,
+        current: images[current],
+      });
+    },
+
+    formatTime(timestamp) {
+      if (!timestamp) return "";
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diff = now - date;
+
+      // 小于1分钟
+      if (diff < 60000) {
+        return "刚刚";
+      }
+      // 小于1小时
+      if (diff < 3600000) {
+        return Math.floor(diff / 60000) + "分钟前";
+      }
+      // 小于24小时
+      if (diff < 86400000) {
+        return Math.floor(diff / 3600000) + "小时前";
+      }
+      // 小于30天
+      if (diff < 2592000000) {
+        return Math.floor(diff / 86400000) + "天前";
+      }
+      // 显示具体日期
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(date.getDate()).padStart(2, "0")}`;
+    },
+
+    formatNumber(num) {
+      if (!num) return 0;
+      if (num < 1000) return num;
+      if (num < 10000) return (num / 1000).toFixed(1) + "k";
+      return (num / 10000).toFixed(1) + "w";
+    },
   },
 };
 </script>
 
 <style lang="scss">
 .container {
+  min-height: 100vh;
+  background: #f8f8f8;
   padding: 20rpx;
 }
 
 .post-list {
   .post-item {
     background: #fff;
-    border-radius: 12rpx;
+    border-radius: 16rpx;
     padding: 24rpx;
     margin-bottom: 20rpx;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 
     .author {
       display: flex;
@@ -215,8 +239,8 @@ export default {
     .content {
       .title {
         font-size: 32rpx;
-        font-weight: bold;
         color: #333;
+        font-weight: bold;
         margin-bottom: 12rpx;
         display: block;
       }
@@ -224,45 +248,49 @@ export default {
       .description {
         font-size: 28rpx;
         color: #666;
-        margin-bottom: 20rpx;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        line-height: 1.6;
+        margin-bottom: 16rpx;
+        display: block;
       }
 
       .images {
-        display: flex;
-        gap: 10rpx;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8rpx;
+        margin-bottom: 20rpx;
 
-        image {
-          flex: 1;
-          height: 200rpx;
+        .image {
+          width: 100%;
+          height: 220rpx;
           border-radius: 8rpx;
         }
       }
     }
 
-    .actions {
-      display: flex;
-      margin-top: 20rpx;
-      border-top: 1rpx solid #f5f5f5;
+    .footer {
+      border-top: 2rpx solid #f5f5f5;
       padding-top: 20rpx;
 
-      .action-item {
-        flex: 1;
+      .stats {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #666;
+        justify-content: space-around;
 
-        .iconfont {
-          font-size: 36rpx;
-          margin-right: 8rpx;
-        }
+        .stat {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
 
-        .count {
-          font-size: 24rpx;
+          .count {
+            font-size: 28rpx;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 4rpx;
+          }
+
+          .label {
+            font-size: 24rpx;
+            color: #999;
+          }
         }
       }
     }

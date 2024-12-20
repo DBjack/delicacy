@@ -80,11 +80,26 @@ export default {
     };
   },
 
-  onLoad() {
+  async onLoad() {
+    const isLoggedIn = await this.checkLoginStatus();
+    if (!isLoggedIn) {
+      return;
+    }
     this.loadUserInfo();
   },
 
   methods: {
+    async checkLoginStatus() {
+      const userInfo = uni.getStorageSync("userInfo");
+      if (!userInfo) {
+        uni.navigateTo({
+          url: "/pages/auth/login",
+        });
+        return false;
+      }
+      return true;
+    },
+
     async loadUserInfo() {
       try {
         const userInfo = uni.getStorageSync("userInfo");
@@ -138,7 +153,7 @@ export default {
 
         const tempFilePath = res.tempFilePaths[0];
         uni.showLoading({
-          title: "上传中...",
+          title: "上传��...",
         });
 
         const uploadRes = await uniCloud.uploadFile({

@@ -1,82 +1,109 @@
 "use strict";
 
 const db = uniCloud.database();
-const dbCmd = db.command;
 const $ = db.command.aggregate;
+const _ = db.command;
 
 exports.main = async (event, context) => {
-  const { action, data } = event;
-
-  switch (action) {
+  switch (event.action) {
     case "create":
-      return await createComment(data);
+      return await createComment(event.params);
     case "getList":
-      return await getCommentList(data);
-    case "like":
-      return await likeComment(data);
+      return await getCommentList(event.params);
     case "delete":
-      return await deleteComment(data);
+      return await deleteComment(event.params);
     default:
       return {
         code: 404,
-        msg: "未找到对应的方法",
+        msg: "未找到对应的操作",
       };
   }
 };
 
 // 创建评论
-async function createComment(data) {
-  const { post_id, user_id, content, reply_to } = data;
-
-  const transaction = await db.startTransaction();
-
+async function createComment(params) {
   try {
+    const { post_id, user_id, content } = params;
+
+    if (!post_id || !user_id || !content) {
+      return {
+        code: -1,
+        msg: "参数不完整",
+      };
+    }
+
+    // 获取用户信息
+    const userInfo = await db.collection("users").doc(user_id).get();
+    if (!userInfo.data || !userInfo.data[0]) {
+      return {
+        code: -1,
+        msg: "用户不存在",
+      };
+    }
+
+    // 获取帖子信息
+    const postInfo = await db.collection("posts").doc(post_id).get();
+    if (!postInfo.data || !postInfo.data[0]) {
+      return {
+        code: -1,
+        msg: "帖子不存在",
+      };
+    }
+
     // 创建评论
-    const comment = await transaction.collection("comments").add({
+    const commentData = {
       post_id,
       user_id,
       content,
-      reply_to,
-      likeCount: 0,
       create_date: new Date(),
-    });
+      update_date: new Date(),
+    };
 
-    // 更新帖子评论数
-    await transaction
+    const result = await db.collection("comments").add(commentData);
+
+    // 更新帖子的评论数
+    await db
       .collection("posts")
       .doc(post_id)
       .update({
-        commentCount: dbCmd.inc(1),
+        comment_count: _.inc(1),
+        update_date: new Date(),
       });
-
-    await transaction.commit();
 
     return {
       code: 0,
       msg: "评论成功",
-      data: comment,
+      data: {
+        _id: result.id,
+        ...commentData,
+      },
     };
-  } catch (e) {
-    await transaction.rollback();
+  } catch (error) {
+    console.error("创建评论失败:", error);
     return {
       code: -1,
-      msg: "评论失败",
-      error: e,
+      msg: error.message || "创建评论失败",
     };
   }
 }
 
 // 获取评论列表
-async function getCommentList(data) {
-  const { post_id, uid } = data;
-
+async function getCommentList(params) {
   try {
+    const { postId, page = 1, pageSize = 20 } = params;
+
+    if (!postId) {
+      return {
+        code: -1,
+        msg: "参数不完整",
+      };
+    }
+
     const list = await db
       .collection("comments")
       .aggregate()
       .match({
-        post_id,
-        reply_to: null, // 只获取一级评论
+        post_id: postId,
       })
       .lookup({
         from: "users",
@@ -84,64 +111,17 @@ async function getCommentList(data) {
         foreignField: "_id",
         as: "user",
       })
-      .unwind("$user")
-      .lookup({
-        from: "comments",
-        let: {
-          comment_id: "$_id",
-        },
-        pipeline: $.pipeline()
-          .match(dbCmd.expr($.eq(["$reply_to", "$$comment_id"])))
-          .lookup({
-            from: "users",
-            localField: "user_id",
-            foreignField: "_id",
-            as: "user",
-          })
-          .unwind("$user")
-          .project({
-            _id: 1,
-            content: 1,
-            create_date: 1,
-            "user._id": 1,
-            "user.nickname": 1,
-            "user.avatar": 1,
-          })
-          .done(),
-        as: "replies",
-      })
-      .lookup({
-        from: "likes",
-        let: {
-          comment_id: "$_id",
-        },
-        pipeline: $.pipeline()
-          .match(
-            dbCmd.expr(
-              $.and([
-                $.eq(["$user_id", uid]),
-                $.eq(["$comment_id", "$$comment_id"]),
-                $.eq(["$type", "like"]),
-              ])
-            )
-          )
-          .done(),
-        as: "like",
-      })
       .project({
         _id: 1,
         content: 1,
-        likeCount: 1,
         create_date: 1,
-        "user._id": 1,
-        "user.nickname": 1,
-        "user.avatar": 1,
-        replies: 1,
-        isLiked: $.gt([$.size("$like"), 0]),
+        user: $.arrayElemAt(["$user", 0]),
       })
       .sort({
         create_date: -1,
       })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
       .end();
 
     return {
@@ -149,133 +129,65 @@ async function getCommentList(data) {
       msg: "获取成功",
       data: list.data,
     };
-  } catch (e) {
+  } catch (error) {
+    console.error("获取评论列表失败:", error);
     return {
       code: -1,
-      msg: "获取失败",
-      error: e,
-    };
-  }
-}
-
-// 点赞评论
-async function likeComment(data) {
-  const { comment_id, user_id } = data;
-
-  const transaction = await db.startTransaction();
-
-  try {
-    const like = await transaction
-      .collection("likes")
-      .where({
-        comment_id,
-        user_id,
-        type: "like",
-      })
-      .get();
-
-    if (like.data.length > 0) {
-      // 取消点赞
-      await transaction.collection("likes").doc(like.data[0]._id).remove();
-
-      await transaction
-        .collection("comments")
-        .doc(comment_id)
-        .update({
-          likeCount: dbCmd.inc(-1),
-        });
-
-      await transaction.commit();
-
-      return {
-        code: 0,
-        msg: "取消点赞成功",
-        data: {
-          isLiked: false,
-        },
-      };
-    } else {
-      // 添加点赞
-      await transaction.collection("likes").add({
-        comment_id,
-        user_id,
-        type: "like",
-        create_date: new Date(),
-      });
-
-      await transaction
-        .collection("comments")
-        .doc(comment_id)
-        .update({
-          likeCount: dbCmd.inc(1),
-        });
-
-      await transaction.commit();
-
-      return {
-        code: 0,
-        msg: "点赞成功",
-        data: {
-          isLiked: true,
-        },
-      };
-    }
-  } catch (e) {
-    await transaction.rollback();
-    return {
-      code: -1,
-      msg: "操作失败",
-      error: e,
+      msg: error.message || "获取评论列表失败",
     };
   }
 }
 
 // 删除评论
-async function deleteComment(data) {
-  const { comment_id, post_id } = data;
-
-  const transaction = await db.startTransaction();
-
+async function deleteComment(params) {
   try {
+    const { commentId, userId } = params;
+
+    if (!commentId || !userId) {
+      return {
+        code: -1,
+        msg: "参数不完整",
+      };
+    }
+
+    // 获取评论信息
+    const commentInfo = await db.collection("comments").doc(commentId).get();
+    if (!commentInfo.data || !commentInfo.data[0]) {
+      return {
+        code: -1,
+        msg: "评论不存在",
+      };
+    }
+
+    // 检查是否是评论作者
+    if (commentInfo.data[0].user_id !== userId) {
+      return {
+        code: -1,
+        msg: "无权删除该评论",
+      };
+    }
+
     // 删除评论
-    await transaction.collection("comments").doc(comment_id).remove();
+    await db.collection("comments").doc(commentId).remove();
 
-    // 删除回复
-    await transaction
-      .collection("comments")
-      .where({
-        reply_to: comment_id,
-      })
-      .remove();
-
-    // 删除相关的点赞
-    await transaction
-      .collection("likes")
-      .where({
-        comment_id,
-      })
-      .remove();
-
-    // 更新帖子评论数
-    await transaction
+    // 更新帖子的评论数
+    await db
       .collection("posts")
-      .doc(post_id)
+      .doc(commentInfo.data[0].post_id)
       .update({
-        commentCount: dbCmd.inc(-1),
+        comment_count: _.inc(-1),
+        update_date: new Date(),
       });
-
-    await transaction.commit();
 
     return {
       code: 0,
       msg: "删除成功",
     };
-  } catch (e) {
-    await transaction.rollback();
+  } catch (error) {
+    console.error("删除评论失败:", error);
     return {
       code: -1,
-      msg: "删除失败",
-      error: e,
+      msg: error.message || "删除评论失败",
     };
   }
 }

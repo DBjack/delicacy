@@ -93,7 +93,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(wx, uniCloud, uni) {
+/* WEBPACK VAR INJECTION */(function(uni, uniCloud) {
 
 var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ 4);
 Object.defineProperty(exports, "__esModule", {
@@ -104,25 +104,19 @@ var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime
 var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 31));
 var _default = {
   onLaunch: function onLaunch() {
-    console.log(1111);
-    // 初始化云空间
-
-    wx.cloud.init({
-      env: "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
-      traceUser: true
-    });
-    uniCloud.init({
-      provider: "aliyun",
-      spaceId: "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e"
-    });
-
-    // 检查登录状态
-    this.checkLogin();
     console.log("App Launch");
+
+    // 初始化云空间
+    if (uni.getSystemInfoSync().platform !== "devtools") {
+      uniCloud.init({
+        provider: "aliyun",
+        spaceId: "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
+        clientSecret: "s8DmEaWFnpPY+4X3a2wlyA=="
+      });
+    }
   },
   methods: {
     checkLogin: function checkLogin() {
-      var _this = this;
       return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee() {
         var token, userInfo;
         return _regenerator.default.wrap(function _callee$(_context) {
@@ -132,29 +126,18 @@ var _default = {
                 _context.prev = 0;
                 token = uni.getStorageSync("token");
                 userInfo = uni.getStorageSync("userInfo");
-                if (!(!token || !userInfo)) {
-                  _context.next = 6;
-                  break;
-                }
-                _context.next = 6;
-                return _this.login();
+                return _context.abrupt("return", !!(token && userInfo));
               case 6:
-                _context.next = 12;
-                break;
-              case 8:
-                _context.prev = 8;
+                _context.prev = 6;
                 _context.t0 = _context["catch"](0);
                 console.error("检查登录状态失败:", _context.t0);
-                uni.showToast({
-                  title: "登录状态检查失败",
-                  icon: "none"
-                });
-              case 12:
+                return _context.abrupt("return", false);
+              case 10:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, null, [[0, 8]]);
+        }, _callee, null, [[0, 6]]);
       }))();
     },
     login: function login() {
@@ -179,51 +162,43 @@ var _default = {
                 });
               case 3:
                 loginResult = _context2.sent;
-                console.log(loginResult, "loginResult");
                 if (loginResult.code) {
-                  _context2.next = 7;
+                  _context2.next = 6;
                   break;
                 }
                 throw new Error("获取微信登录凭证失败");
-              case 7:
-                _context2.next = 9;
+              case 6:
+                _context2.next = 8;
                 return uniCloud.callFunction({
                   name: "user",
                   data: {
                     action: "login",
                     params: {
-                      code: loginResult.code,
-                      openId: loginResult.code
+                      code: loginResult.code
                     }
                   }
                 });
-              case 9:
+              case 8:
                 loginRes = _context2.sent;
-                console.log("云函数返回结果:", loginRes);
                 if (!(loginRes.result.code !== 0)) {
-                  _context2.next = 13;
+                  _context2.next = 11;
                   break;
                 }
                 throw new Error(loginRes.result.msg || "登录失败");
-              case 13:
+              case 11:
                 // 保存登录状态
                 data = loginRes.result.data;
                 if (data) {
-                  _context2.next = 16;
+                  _context2.next = 14;
                   break;
                 }
-                throw new Error("未获取到用户数据");
-              case 16:
+                throw new Error("未获取到���户数据");
+              case 14:
                 uni.setStorageSync("token", data._id);
                 uni.setStorageSync("userInfo", data);
-                uni.showToast({
-                  title: loginRes.result.msg,
-                  icon: "success"
-                });
-                _context2.next = 25;
-                break;
-              case 21:
-                _context2.prev = 21;
+                return _context2.abrupt("return", true);
+              case 19:
+                _context2.prev = 19;
                 _context2.t0 = _context2["catch"](0);
                 console.error("登录失败:", _context2.t0);
                 uni.showToast({
@@ -231,12 +206,13 @@ var _default = {
                   icon: "none",
                   duration: 2000
                 });
-              case 25:
+                return _context2.abrupt("return", false);
+              case 24:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, null, [[0, 21]]);
+        }, _callee2, null, [[0, 19]]);
       }))();
     }
   },
@@ -248,7 +224,7 @@ var _default = {
   }
 };
 exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/wx.js */ 1)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js */ 27)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"]))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js */ 27)["default"]))
 
 /***/ }),
 

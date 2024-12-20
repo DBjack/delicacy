@@ -9951,7 +9951,7 @@ var S = "development" === "development",
   k = "true" === undefined || !0 === undefined,
   A = I([]),
   C = "h5" === b ? "web" : "app-plus" === b ? "app" : b,
-  P = I({"address":["127.0.0.1","172.23.192.1","172.21.224.1","172.22.112.1","192.168.11.109"],"servePort":7001,"debugPort":9001,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/software/HBuilderX/plugins/unicloud/**/*.js"]}),
+  P = I({"address":["127.0.0.1","172.23.192.1","172.21.224.1","172.22.112.1","192.168.11.109"],"servePort":7000,"debugPort":9000,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/software/HBuilderX/plugins/unicloud/**/*.js"]}),
   T = I([{"provider":"aliyun","spaceName":"delicacy-cloud","spaceId":"mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e","clientSecret":"s8DmEaWFnpPY+4X3a2wlyA==","endpoint":"https://api.next.bspapp.com"}]) || [],
   x = true;
 var O = "";
@@ -17909,122 +17909,73 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _default = {
   "pages": [{
-    "path": "pages/index/index",
-    "style": {
-      "navigationBarTitleText": "美食圈"
-    }
-  }, {
-    "path": "pages/publish/publish",
-    "style": {
-      "navigationBarTitleText": "发布美食"
-    }
-  }, {
     "path": "pages/discover/discover",
     "style": {
-      "navigationBarTitleText": "发现"
-    }
-  }, {
-    "path": "pages/profile/profile",
-    "style": {
-      "navigationBarTitleText": "我的"
-    }
-  }, {
-    "path": "pages/auth/login",
-    "style": {
-      "navigationBarTitleText": "登录"
-    }
-  }, {
-    "path": "pages/user/edit-profile",
-    "style": {
-      "navigationBarTitleText": "编辑资料"
-    }
-  }, {
-    "path": "pages/draft/index",
-    "style": {
-      "navigationBarTitleText": "草稿箱"
-    }
-  }, {
-    "path": "pages/user/followers",
-    "style": {
-      "navigationBarTitleText": "粉丝列表"
-    }
-  }, {
-    "path": "pages/user/following",
-    "style": {
-      "navigationBarTitleText": "关注列表"
-    }
-  }, {
-    "path": "pages/search/index",
-    "style": {
-      "navigationBarTitleText": "搜索",
-      "navigationBarBackgroundColor": "#ffffff",
-      "navigationBarTextStyle": "black"
+      "navigationBarTitleText": "美食天地"
     }
   }, {
     "path": "pages/user/user",
     "style": {
-      "navigationBarTitleText": "用户主页"
+      "navigationBarTitleText": "我的"
     }
   }, {
-    "path": "pages/user/edit-profile",
+    "path": "pages/index/index",
     "style": {
-      "navigationBarTitleText": "编辑资料"
+      "navigationBarTitleText": "首页"
+    }
+  }, {
+    "path": "pages/publish/publish",
+    "style": {
+      "navigationBarTitleText": "发布"
     }
   }],
   "subPackages": [{
     "root": "packagePost",
     "pages": [{
-      "path": "pages/detail",
+      "path": "pages/detail/detail",
       "style": {
-        "navigationBarTitleText": "美食详情"
+        "navigationBarTitleText": "详情"
       }
     }, {
-      "path": "pages/list",
+      "path": "pages/list/list",
       "style": {
-        "navigationBarTitleText": "帖子列表",
+        "navigationBarTitleText": "列表",
         "enablePullDownRefresh": true
       }
     }]
   }],
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#FF6B6B",
-    "backgroundColor": "#FFFFFF",
+    "selectedColor": "#ff6b6b",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
     "list": [{
-      "pagePath": "pages/index/index",
-      "text": "首页",
-      "iconPath": "static/tabbar/index.png",
-      "selectedIconPath": "static/tabbar/index-active.png"
-    }, {
       "pagePath": "pages/discover/discover",
       "text": "发现",
       "iconPath": "static/tabbar/discover.png",
       "selectedIconPath": "static/tabbar/discover-active.png"
+    }, {
+      "pagePath": "pages/index/index",
+      "text": "首页",
+      "iconPath": "static/tabbar/index.png",
+      "selectedIconPath": "static/tabbar/index-active.png"
     }, {
       "pagePath": "pages/publish/publish",
       "text": "发布",
       "iconPath": "static/tabbar/publish.png",
       "selectedIconPath": "static/tabbar/publish-active.png"
     }, {
-      "pagePath": "pages/profile/profile",
+      "pagePath": "pages/user/user",
       "text": "我的",
-      "iconPath": "static/tabbar/profile.png",
-      "selectedIconPath": "static/tabbar/profile-active.png"
+      "iconPath": "static/tabbar/user.png",
+      "selectedIconPath": "static/tabbar/user-active.png"
     }]
   },
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "美食圈",
-    "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8"
-  },
-  "uniIdRouter": {},
-  "permission": {
-    "scope": {
-      "userInfo": {
-        "desc": "您的用户信息将用于小程序登录"
-      }
-    }
+    "navigationBarTitleText": "美食天地",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f8f8f8"
   }
 };
 exports.default = _default;
@@ -18208,108 +18159,6 @@ uni.addInterceptor({
   }
 });
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"]))
-
-/***/ }),
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */,
-/* 70 */,
-/* 71 */,
-/* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */,
-/* 78 */,
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */,
-/* 86 */,
-/* 87 */,
-/* 88 */,
-/* 89 */,
-/* 90 */,
-/* 91 */,
-/* 92 */,
-/* 93 */,
-/* 94 */,
-/* 95 */,
-/* 96 */,
-/* 97 */,
-/* 98 */,
-/* 99 */,
-/* 100 */
-/*!************************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/objectWithoutProperties.js ***!
-  \************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var objectWithoutPropertiesLoose = __webpack_require__(/*! ./objectWithoutPropertiesLoose.js */ 101);
-function _objectWithoutProperties(source, excluded) {
-  if (source == null) return {};
-  var target = objectWithoutPropertiesLoose(source, excluded);
-  var key, i;
-  if (Object.getOwnPropertySymbols) {
-    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-    for (i = 0; i < sourceSymbolKeys.length; i++) {
-      key = sourceSymbolKeys[i];
-      if (excluded.indexOf(key) >= 0) continue;
-      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
-      target[key] = source[key];
-    }
-  }
-  return target;
-}
-module.exports = _objectWithoutProperties, module.exports.__esModule = true, module.exports["default"] = module.exports;
-
-/***/ }),
-/* 101 */
-/*!*****************************************************************************!*\
-  !*** ./node_modules/@babel/runtime/helpers/objectWithoutPropertiesLoose.js ***!
-  \*****************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-  return target;
-}
-module.exports = _objectWithoutPropertiesLoose, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ })
 ]]);

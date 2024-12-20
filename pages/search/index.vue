@@ -153,7 +153,7 @@ export default {
 
     goToDetail(item) {
       uni.navigateTo({
-        url: `/packagePost/pages/detail?id=${item._id}`,
+        url: `/packagePost/pages/detail/detail?id=${item._id}`,
       });
     },
 

@@ -2,9 +2,12 @@
 
 const db = uniCloud.database();
 const $ = db.command.aggregate;
+const _ = db.command;
 
 exports.main = async (event, context) => {
   switch (event.action) {
+    case "login":
+      return await login(event.params);
     case "getUserInfo":
       return await getUserInfo(event.params);
     case "updateUserInfo":
@@ -22,6 +25,81 @@ exports.main = async (event, context) => {
       };
   }
 };
+
+// 用户登录
+async function login(params) {
+  try {
+    const { code, userInfo } = params;
+    if (!code || !userInfo) {
+      throw new Error("参数不完整");
+    }
+
+    // 获取微信用户openid
+    const res = await uniCloud.httpclient.request(
+      `https://api.weixin.qq.com/sns/jscode2session?appid=wx58337efb4c35fab6&secret=55535e53b3e9d384301a806a81697d8b&js_code=${code}&grant_type=authorization_code`,
+      {
+        dataType: "json",
+      }
+    );
+
+    if (!res.data.openid) {
+      throw new Error("获取用户openid失败");
+    }
+
+    // 查找或创建用户
+    let userRecord = await db
+      .collection("users")
+      .where({
+        openid: res.data.openid,
+      })
+      .get();
+
+    let userId;
+
+    if (userRecord.data.length === 0) {
+      // 创建新用户
+      const { id } = await db.collection("users").add({
+        openid: res.data.openid,
+        nickname: userInfo.nickName,
+        avatar: userInfo.avatarUrl,
+        gender: userInfo.gender,
+        country: userInfo.country,
+        province: userInfo.province,
+        city: userInfo.city,
+        create_date: new Date(),
+        update_date: new Date(),
+      });
+      userId = id;
+    } else {
+      // 更新用户信息
+      userId = userRecord.data[0]._id;
+      await db.collection("users").doc(userId).update({
+        nickname: userInfo.nickName,
+        avatar: userInfo.avatarUrl,
+        gender: userInfo.gender,
+        country: userInfo.country,
+        province: userInfo.province,
+        city: userInfo.city,
+        update_date: new Date(),
+      });
+    }
+
+    // 获取最新的用户信息
+    const newUserInfo = await db.collection("users").doc(userId).get();
+
+    return {
+      code: 0,
+      msg: "登录成功",
+      data: newUserInfo.data[0],
+    };
+  } catch (error) {
+    console.error("登录失败:", error);
+    return {
+      code: -1,
+      msg: error.message || "登录失败",
+    };
+  }
+}
 
 // 获取用户信息
 async function getUserInfo(params) {
@@ -43,7 +121,11 @@ async function getUserInfo(params) {
           user_id: "$_id",
         },
         pipeline: $.pipeline()
-          .match(_.expr($.eq(["$user_id", "$$user_id"])))
+          .match({
+            $expr: {
+              $eq: ["$user_id", "$$user_id"],
+            },
+          })
           .count("total")
           .done(),
         as: "posts_stats",
@@ -54,7 +136,11 @@ async function getUserInfo(params) {
           user_id: "$_id",
         },
         pipeline: $.pipeline()
-          .match(_.expr($.eq(["$following_id", "$$user_id"])))
+          .match({
+            $expr: {
+              $eq: ["$following_id", "$$user_id"],
+            },
+          })
           .count("total")
           .done(),
         as: "followers_stats",
@@ -65,7 +151,11 @@ async function getUserInfo(params) {
           user_id: "$_id",
         },
         pipeline: $.pipeline()
-          .match(_.expr($.eq(["$follower_id", "$$user_id"])))
+          .match({
+            $expr: {
+              $eq: ["$follower_id", "$$user_id"],
+            },
+          })
           .count("total")
           .done(),
         as: "following_stats",

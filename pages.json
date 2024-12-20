@@ -1,77 +1,27 @@
 {
 	"pages": [
 		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "美食圈"
-			}
-		},
-		{
-			"path": "pages/publish/publish",
-			"style": {
-				"navigationBarTitleText": "发布美食"
-			}
-		},
-		{
 			"path": "pages/discover/discover",
 			"style": {
-				"navigationBarTitleText": "发现"
-			}
-		},
-		{
-			"path": "pages/profile/profile",
-			"style": {
-				"navigationBarTitleText": "我的"
-			}
-		},
-		{
-			"path": "pages/auth/login",
-			"style": {
-				"navigationBarTitleText": "登录"
-			}
-		},
-		{
-			"path": "pages/user/edit-profile",
-			"style": {
-				"navigationBarTitleText": "编辑资料"
-			}
-		},
-		{
-			"path": "pages/draft/index",
-			"style": {
-				"navigationBarTitleText": "草稿箱"
-			}
-		},
-		{
-			"path": "pages/user/followers",
-			"style": {
-				"navigationBarTitleText": "粉丝列表"
-			}
-		},
-		{
-			"path": "pages/user/following",
-			"style": {
-				"navigationBarTitleText": "关注列表"
-			}
-		},
-		{
-			"path": "pages/search/index",
-			"style": {
-				"navigationBarTitleText": "搜索",
-				"navigationBarBackgroundColor": "#ffffff",
-				"navigationBarTextStyle": "black"
+				"navigationBarTitleText": "美食天地"
 			}
 		},
 		{
 			"path": "pages/user/user",
 			"style": {
-				"navigationBarTitleText": "用户主页"
+				"navigationBarTitleText": "我的"
 			}
 		},
 		{
-			"path": "pages/user/edit-profile",
+			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "编辑资料"
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/publish/publish",
+			"style": {
+				"navigationBarTitleText": "发布"
 			}
 		}
 	],
@@ -80,15 +30,15 @@
 			"root": "packagePost",
 			"pages": [
 				{
-					"path": "pages/detail",
+					"path": "pages/detail/detail",
 					"style": {
-						"navigationBarTitleText": "美食详情"
+						"navigationBarTitleText": "详情"
 					}
 				},
 				{
-					"path": "pages/list",
+					"path": "pages/list/list",
 					"style": {
-						"navigationBarTitleText": "帖子列表",
+						"navigationBarTitleText": "列表",
 						"enablePullDownRefresh": true
 					}
 				}
@@ -97,20 +47,21 @@
 	],
 	"tabBar": {
 		"color": "#999999",
-		"selectedColor": "#FF6B6B",
-		"backgroundColor": "#FFFFFF",
+		"selectedColor": "#ff6b6b",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "black",
 		"list": [
-			{
-				"pagePath": "pages/index/index",
-				"text": "首页",
-				"iconPath": "static/tabbar/index.png",
-				"selectedIconPath": "static/tabbar/index-active.png"
-			},
 			{
 				"pagePath": "pages/discover/discover",
 				"text": "发现",
 				"iconPath": "static/tabbar/discover.png",
 				"selectedIconPath": "static/tabbar/discover-active.png"
+			},
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/index.png",
+				"selectedIconPath": "static/tabbar/index-active.png"
 			},
 			{
 				"pagePath": "pages/publish/publish",
@@ -119,25 +70,17 @@
 				"selectedIconPath": "static/tabbar/publish-active.png"
 			},
 			{
-				"pagePath": "pages/profile/profile",
+				"pagePath": "pages/user/user",
 				"text": "我的",
-				"iconPath": "static/tabbar/profile.png",
-				"selectedIconPath": "static/tabbar/profile-active.png"
+				"iconPath": "static/tabbar/user.png",
+				"selectedIconPath": "static/tabbar/user-active.png"
 			}
 		]
 	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "美食圈",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	},
-	"uniIdRouter": {},
-	"permission": {
-		"scope": {
-			"userInfo": {
-				"desc": "您的用户信息将用于小程序登录"
-			}
-		}
+		"navigationBarTitleText": "美食天地",
+		"navigationBarBackgroundColor": "#ffffff",
+		"backgroundColor": "#f8f8f8"
 	}
 }

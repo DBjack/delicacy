@@ -1,24 +1,16 @@
 <script>
 export default {
   onLaunch: function () {
-    console.log(1111);
-    // 初始化云空间
-    // #ifdef MP-WEIXIN
-    wx.cloud.init({
-      env: "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
-      traceUser: true,
-    });
-    // #endif
-
-    uniCloud.init({
-      provider: "aliyun",
-      spaceId: "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
-    });
-
-    // 检查登录状态
-    this.checkLogin();
-
     console.log("App Launch");
+
+    // 初始化云空间
+    if (uni.getSystemInfoSync().platform !== "devtools") {
+      uniCloud.init({
+        provider: "aliyun",
+        spaceId: "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
+        clientSecret: "s8DmEaWFnpPY+4X3a2wlyA==",
+      });
+    }
   },
 
   methods: {
@@ -26,16 +18,10 @@ export default {
       try {
         const token = uni.getStorageSync("token");
         const userInfo = uni.getStorageSync("userInfo");
-
-        if (!token || !userInfo) {
-          await this.login();
-        }
+        return !!(token && userInfo);
       } catch (error) {
         console.error("检查登录状态失败:", error);
-        uni.showToast({
-          title: "登录状态检查失败",
-          icon: "none",
-        });
+        return false;
       }
     },
 
@@ -50,24 +36,20 @@ export default {
           });
         });
 
-        console.log(loginResult, "loginResult");
-
         if (!loginResult.code) {
           throw new Error("获取微信登录凭证失败");
         }
 
-        // 调用云函数录
+        // 调用云函数登录
         const loginRes = await uniCloud.callFunction({
           name: "user",
           data: {
             action: "login",
             params: {
               code: loginResult.code,
-              openId: loginResult.code,
             },
           },
         });
-        console.log("云函数返回结果:", loginRes);
 
         if (loginRes.result.code !== 0) {
           throw new Error(loginRes.result.msg || "登录失败");
@@ -76,15 +58,12 @@ export default {
         // 保存登录状态
         const { data } = loginRes.result;
         if (!data) {
-          throw new Error("未获取到用户数据");
+          throw new Error("未获取到���户数据");
         }
         uni.setStorageSync("token", data._id);
         uni.setStorageSync("userInfo", data);
 
-        uni.showToast({
-          title: loginRes.result.msg,
-          icon: "success",
-        });
+        return true;
       } catch (error) {
         console.error("登录失败:", error);
         uni.showToast({
@@ -92,6 +71,7 @@ export default {
           icon: "none",
           duration: 2000,
         });
+        return false;
       }
     },
   },

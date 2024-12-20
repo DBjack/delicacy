@@ -1,17 +1,15 @@
 <template>
   <view class="container">
-    <view class="post-content">
+    <view class="post-content" v-if="post._id">
       <view class="author">
         <image
           class="avatar"
-          :src="(post.author && post.author.avatar) || defaultAvatar"
+          :src="post.author?.avatar || '/static/images/default-avatar.png'"
           mode="aspectFill"
-          @tap="goToUser(post.author && post.author._id)"
+          @tap="goToUser(post.author?._id)"
         />
         <view class="info">
-          <text class="nickname">{{
-            (post.author && post.author.nickname) || "美食家"
-          }}</text>
+          <text class="nickname">{{ post.author?.nickname || "美食家" }}</text>
           <text class="time">{{ formatTime(post.create_date) }}</text>
         </view>
         <button
@@ -23,9 +21,11 @@
           {{ isFollowing ? "已关注" : "关注" }}
         </button>
       </view>
+
       <text class="title">{{ post.title }}</text>
       <text class="description">{{ post.description }}</text>
-      <view v-if="post.images && post.images.length" class="images">
+
+      <view class="images" v-if="post.images?.length">
         <image
           v-for="(image, index) in post.images"
           :key="index"
@@ -34,7 +34,8 @@
           @tap="previewImage(index)"
         />
       </view>
-      <view v-if="post.tags && post.tags.length" class="tags">
+
+      <view class="tags" v-if="post.tags?.length">
         <text
           v-for="tag in post.tags"
           :key="tag"
@@ -44,11 +45,13 @@
           #{{ tag }}
         </text>
       </view>
-      <view v-if="post.location" class="location">
+
+      <view class="location" v-if="post.location">
         <text class="iconfont icon-location"></text>
         <text>{{ post.location }}</text>
       </view>
     </view>
+
     <view class="comments">
       <view class="section-title">评论 {{ post.commentCount || 0 }}</view>
       <view class="comment-list">
@@ -59,20 +62,19 @@
         >
           <image
             class="avatar"
-            :src="(comment.user && comment.user.avatar) || defaultAvatar"
+            :src="comment.user?.avatar || '/static/images/default-avatar.png'"
             mode="aspectFill"
           />
           <view class="content">
-            <text class="nickname">{{
-              comment.user && comment.user.nickname
-            }}</text>
+            <text class="nickname">{{ comment.user?.nickname }}</text>
             <text class="text">{{ comment.content }}</text>
             <text class="time">{{ formatTime(comment.create_date) }}</text>
           </view>
         </view>
       </view>
-      <view v-if="!comments.length" class="empty">暂无评论</view>
+      <view class="empty" v-if="!comments.length">暂无评论</view>
     </view>
+
     <view class="action-bar">
       <view class="comment-input">
         <input
@@ -85,13 +87,15 @@
       <view class="actions">
         <view class="action-item" @tap="handleLike">
           <text
-            :class="['iconfont', isLiked ? 'icon-like-fill' : 'icon-like']"
+            class="iconfont"
+            :class="isLiked ? 'icon-like-fill' : 'icon-like'"
           ></text>
           <text class="count">{{ post.likeCount || 0 }}</text>
         </view>
         <view class="action-item" @tap="handleCollect">
           <text
-            :class="['iconfont', isCollected ? 'icon-star-fill' : 'icon-star']"
+            class="iconfont"
+            :class="isCollected ? 'icon-star-fill' : 'icon-star'"
           ></text>
           <text class="count">{{ post.collectCount || 0 }}</text>
         </view>
@@ -108,6 +112,7 @@
 export default {
   data() {
     return {
+      postId: "",
       post: {},
       comments: [],
       commentText: "",
@@ -115,7 +120,6 @@ export default {
       isCollected: false,
       isFollowing: false,
       currentUser: null,
-      defaultAvatar: "/packagePost/static/images/default-avatar.png",
     };
   },
 
@@ -130,28 +134,23 @@ export default {
   methods: {
     formatTime(date) {
       if (!date) return "";
-      const d = new Date(date);
+      date = new Date(date);
       const now = new Date();
-      const diff = now - d;
-      const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+      const diff = now - date;
+      const minute = 1000 * 60;
+      const hour = minute * 60;
+      const day = hour * 24;
 
-      if (days === 0) {
-        const hours = Math.floor(diff / (60 * 60 * 1000));
-        if (hours === 0) {
-          const minutes = Math.floor(diff / (60 * 1000));
-          if (minutes === 0) {
-            return "刚刚";
-          }
-          return `${minutes}分钟前`;
-        }
-        return `${hours}小时前`;
-      } else if (days < 7) {
-        return `${days}天前`;
+      if (diff < minute) {
+        return "刚刚";
+      } else if (diff < hour) {
+        return Math.floor(diff / minute) + "分钟前";
+      } else if (diff < day) {
+        return Math.floor(diff / hour) + "小时前";
+      } else if (diff < day * 30) {
+        return Math.floor(diff / day) + "天前";
       } else {
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-          2,
-          "0"
-        )}-${String(d.getDate()).padStart(2, "0")}`;
+        return `${date.getMonth() + 1}月${date.getDate()}日`;
       }
     },
 
@@ -196,8 +195,6 @@ export default {
           action: "getList",
           params: {
             postId: this.postId,
-            page: 1,
-            pageSize: 20,
           },
         },
       });
@@ -234,7 +231,7 @@ export default {
     goToUser(userId) {
       if (userId) {
         uni.navigateTo({
-          url: `/packageUser/pages/profile/profile?id=${userId}`,
+          url: `/pages/user/user?id=${userId}`,
         });
       }
     },
@@ -281,7 +278,7 @@ export default {
 
     previewImage(index) {
       const images = this.post.images;
-      if (images && images.length) {
+      if (images?.length) {
         uni.previewImage({
           current: images[index],
           urls: images,
@@ -321,7 +318,7 @@ export default {
             params: {
               post_id: this.postId,
               user_id: userInfo._id,
-              content: content,
+              content,
             },
           },
         });
@@ -370,8 +367,8 @@ export default {
         if (res.result.code === 0) {
           this.isLiked = !this.isLiked;
           this.post.likeCount = this.isLiked
-            ? this.post.likeCount + 1
-            : this.post.likeCount - 1;
+            ? (this.post.likeCount || 0) + 1
+            : (this.post.likeCount || 1) - 1;
         } else {
           throw new Error(res.result.msg);
         }
@@ -408,8 +405,8 @@ export default {
         if (res.result.code === 0) {
           this.isCollected = !this.isCollected;
           this.post.collectCount = this.isCollected
-            ? this.post.collectCount + 1
-            : this.post.collectCount - 1;
+            ? (this.post.collectCount || 0) + 1
+            : (this.post.collectCount || 1) - 1;
         } else {
           throw new Error(res.result.msg);
         }
@@ -433,7 +430,7 @@ export default {
   onShareAppMessage() {
     return {
       title: this.post.title,
-      path: `/packagePost/pages/detail?id=${this.postId}`,
+      path: `/packagePost/pages/detail/detail?id=${this.postId}`,
     };
   },
 
@@ -443,16 +440,24 @@ export default {
       query: `id=${this.postId}`,
     };
   },
+
+  onPullDownRefresh() {
+    this.loadData().finally(() => {
+      uni.stopPullDownRefresh();
+    });
+  },
 };
 </script>
 
 <style lang="scss">
 .container {
-  padding: 30rpx;
-  background: #fff;
+  padding-bottom: 120rpx;
 }
 
 .post-content {
+  background: #fff;
+  padding: 30rpx;
+
   .author {
     display: flex;
     align-items: center;
@@ -514,15 +519,16 @@ export default {
   }
 
   .images {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -10rpx;
     margin-bottom: 30rpx;
 
     image {
-      width: calc(33.33% - 20rpx);
-      margin: 10rpx;
+      width: 100%;
       border-radius: 12rpx;
+      margin-bottom: 20rpx;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 
@@ -555,9 +561,9 @@ export default {
 }
 
 .comments {
-  margin-top: 30rpx;
-  padding-top: 30rpx;
-  border-top: 1rpx solid #f5f5f5;
+  margin-top: 20rpx;
+  background: #fff;
+  padding: 30rpx;
 
   .section-title {
     font-size: 32rpx;

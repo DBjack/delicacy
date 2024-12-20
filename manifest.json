@@ -57,9 +57,6 @@
             "getLocation"
         ],
         "permission": {
-            "scope.userLocation": {
-                "desc": "你的位置信息将用于小程序位置接口的效果展示"
-            },
             "scope.userInfo": {
                 "desc": "用于完善用户资料"
             }
@@ -74,8 +71,8 @@
     "mp-toutiao" : {
         "usingComponents" : true
     },
-    "uniStatistics" : {
-        "enable" : false
+    "uniStatistics": {
+        "enable": false
     },
     "vueVersion" : "2",
     "h5" : {
@@ -87,8 +84,8 @@
             "use-cloud": true,
             "provider": "aliyun",
             "spaceId": "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
-            "functionRoot": "/uniCloud-aliyun/cloudfunctions",
-            "icp": false
+            "functionRoot": "uniCloud-aliyun/cloudfunctions",
+            "clientSecret": "s8DmEaWFnpPY+4X3a2wlyA=="
         }
     }
 }
