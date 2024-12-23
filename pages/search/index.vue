@@ -2,25 +2,25 @@
   <view class="container">
     <view class="search-box">
       <view class="search-bar">
-        <text class="iconfont icon-search"></text>
+        <view class="iconfont icon-search"></view>
         <input
           class="search-input"
           type="text"
           v-model="keyword"
-          placeholder="搜索美食、用户"
+          placeholder="搜索美食、食谱、达人"
           confirm-type="search"
           @confirm="handleSearch"
-          focus
+          @input="handleInput"
         />
-        <text class="clear-btn" @tap="clearKeyword" v-if="keyword">×</text>
+        <view class="clear-btn" v-if="keyword" @tap="clearKeyword">×</view>
       </view>
-      <text class="cancel-btn" @tap="goBack">取消</text>
+      <view class="cancel-btn" @tap="goBack">取消</view>
     </view>
 
-    <view class="history" v-if="!keyword && searchHistory.length">
-      <view class="header">
+    <view class="history-section" v-if="!keyword && searchHistory.length">
+      <view class="section-header">
         <text class="title">搜索历史</text>
-        <text class="clear" @tap="clearHistory">清空</text>
+        <view class="clear-all" @tap="clearHistory">清空</view>
       </view>
       <view class="history-list">
         <view
@@ -29,34 +29,83 @@
           :key="index"
           @tap="useHistoryKeyword(item)"
         >
-          <text class="iconfont icon-time"></text>
+          <view class="iconfont icon-time"></view>
+          <view class="keyword">{{ item }}</view>
+          <view class="delete-btn" @tap.stop="deleteHistory(index)">×</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="hot-section" v-if="!keyword">
+      <view class="section-header">
+        <text class="title">热门搜索</text>
+      </view>
+      <view class="hot-list">
+        <view
+          class="hot-item"
+          v-for="(item, index) in hotSearches"
+          :key="index"
+          @tap="useHistoryKeyword(item)"
+        >
+          <text class="rank" :class="{ top: index < 3 }">{{ index + 1 }}</text>
           <text class="keyword">{{ item }}</text>
         </view>
       </view>
     </view>
 
-    <view class="result-list" v-if="keyword">
-      <view class="empty" v-if="!searchResult.length">
-        <text>暂无相关内容</text>
-      </view>
-      <view
-        class="result-item"
-        v-for="item in searchResult"
-        :key="item._id"
-        @tap="goToDetail(item)"
-      >
-        <image
-          class="cover"
-          :src="item.images[0]"
-          mode="aspectFill"
-          v-if="item.images && item.images.length"
-        />
-        <view class="info">
-          <text class="title">{{ item.title }}</text>
-          <text class="desc">{{ item.content }}</text>
+    <scroll-view
+      v-if="keyword"
+      scroll-y
+      class="search-results"
+      @scrolltolower="loadMore"
+      refresher-enabled
+      :refresher-triggered="isRefreshing"
+      @refresherrefresh="onRefresh"
+    >
+      <view class="result-list" v-if="searchResults.length">
+        <view
+          class="result-item"
+          v-for="item in searchResults"
+          :key="item._id"
+          @tap="goToDetail(item._id)"
+        >
+          <image
+            class="cover"
+            :src="item.cover || defaultImage"
+            mode="aspectFill"
+          />
+          <view class="info">
+            <text class="title">{{ item.title }}</text>
+            <text class="description">{{ item.description }}</text>
+            <view class="meta">
+              <view class="author">
+                <image
+                  class="avatar"
+                  :src="item.author.avatar || defaultAvatar"
+                  mode="aspectFill"
+                />
+                <text class="nickname">{{ item.author.nickname }}</text>
+              </view>
+              <text class="likes">{{ formatNumber(item.likeCount) }} 赞</text>
+            </view>
+          </view>
         </view>
       </view>
-    </view>
+
+      <view v-else-if="hasSearched" class="empty-result">
+        <image
+          class="empty-image"
+          src="/static/images/empty-search.png"
+          mode="aspectFit"
+        />
+        <text class="empty-text">暂无相关内容</text>
+      </view>
+
+      <uni-load-more
+        v-if="searchResults.length"
+        :status="loadMoreStatus"
+      ></uni-load-more>
+    </scroll-view>
   </view>
 </template>
 
@@ -68,7 +117,27 @@ export default {
     return {
       keyword: "",
       searchHistory: [],
-      searchResult: [],
+      hotSearches: [
+        "红烧肉",
+        "可乐鸡翅",
+        "糖醋排骨",
+        "水煮鱼",
+        "麻婆豆腐",
+        "回锅肉",
+        "宫保鸡丁",
+        "鱼香肉丝",
+        "酸菜鱼",
+        "辣子鸡",
+      ],
+      searchResults: [],
+      page: 1,
+      pageSize: 10,
+      loadMoreStatus: "more",
+      isRefreshing: false,
+      isLoading: false,
+      hasSearched: false,
+      defaultImage: "/static/images/food-default.png",
+      defaultAvatar: "/static/images/avatar-default.png",
     };
   },
 
@@ -78,25 +147,32 @@ export default {
 
   methods: {
     loadSearchHistory() {
-      const history = uni.getStorageSync("searchHistory") || [];
-      this.searchHistory = history;
+      const history = uni.getStorageSync("searchHistory");
+      if (history) {
+        this.searchHistory = JSON.parse(history);
+      }
     },
 
     saveSearchHistory() {
-      if (!this.keyword) return;
+      uni.setStorageSync("searchHistory", JSON.stringify(this.searchHistory));
+    },
 
-      let history = [...this.searchHistory];
-      // 删除已存在的相同关键词
-      history = history.filter((item) => item !== this.keyword);
-      // 添加到开头
-      history.unshift(this.keyword);
-      // 限制数量
-      if (history.length > MAX_HISTORY) {
-        history = history.slice(0, MAX_HISTORY);
+    addToHistory(keyword) {
+      if (!keyword) return;
+      const index = this.searchHistory.indexOf(keyword);
+      if (index > -1) {
+        this.searchHistory.splice(index, 1);
       }
+      this.searchHistory.unshift(keyword);
+      if (this.searchHistory.length > MAX_HISTORY) {
+        this.searchHistory.pop();
+      }
+      this.saveSearchHistory();
+    },
 
-      this.searchHistory = history;
-      uni.setStorageSync("searchHistory", history);
+    deleteHistory(index) {
+      this.searchHistory.splice(index, 1);
+      this.saveSearchHistory();
     },
 
     clearHistory() {
@@ -106,7 +182,7 @@ export default {
         success: (res) => {
           if (res.confirm) {
             this.searchHistory = [];
-            uni.removeStorageSync("searchHistory");
+            this.saveSearchHistory();
           }
         },
       });
@@ -119,26 +195,51 @@ export default {
 
     clearKeyword() {
       this.keyword = "";
-      this.searchResult = [];
+      this.searchResults = [];
+      this.hasSearched = false;
+    },
+
+    handleInput() {
+      if (!this.keyword) {
+        this.searchResults = [];
+        this.hasSearched = false;
+      }
     },
 
     async handleSearch() {
       if (!this.keyword.trim()) return;
+      this.page = 1;
+      this.addToHistory(this.keyword.trim());
+      await this.searchPosts();
+    },
+
+    async searchPosts() {
+      if (this.isLoading) return;
+      this.isLoading = true;
 
       try {
         const res = await uniCloud.callFunction({
-          name: "post",
+          name: "posts",
           data: {
-            action: "search",
+            action: "searchPosts",
             params: {
-              keyword: this.keyword,
+              keyword: this.keyword.trim(),
+              page: this.page,
+              pageSize: this.pageSize,
             },
           },
         });
 
         if (res.result.code === 0) {
-          this.searchResult = res.result.data;
-          this.saveSearchHistory();
+          const posts = res.result.data;
+          if (this.page === 1) {
+            this.searchResults = posts;
+          } else {
+            this.searchResults = [...this.searchResults, ...posts];
+          }
+          this.loadMoreStatus =
+            posts.length < this.pageSize ? "noMore" : "more";
+          this.hasSearched = true;
         } else {
           throw new Error(res.result.msg);
         }
@@ -148,48 +249,78 @@ export default {
           title: "搜索失败",
           icon: "none",
         });
+      } finally {
+        this.isLoading = false;
+        if (this.isRefreshing) {
+          this.isRefreshing = false;
+          uni.stopPullDownRefresh();
+        }
       }
     },
 
-    goToDetail(item) {
+    onRefresh() {
+      this.page = 1;
+      this.isRefreshing = true;
+      this.searchPosts();
+    },
+
+    loadMore() {
+      if (this.loadMoreStatus === "noMore" || this.isLoading) return;
+      this.page++;
+      this.searchPosts();
+    },
+
+    goToDetail(id) {
       uni.navigateTo({
-        url: `/packagePost/pages/detail/detail?id=${item._id}`,
+        url: `/packagePost/pages/detail/detail?id=${id}`,
       });
     },
 
     goBack() {
       uni.navigateBack();
     },
+
+    formatNumber(num) {
+      if (!num) return 0;
+      if (num < 1000) return num;
+      if (num < 10000) return (num / 1000).toFixed(1) + "k";
+      return (num / 10000).toFixed(1) + "w";
+    },
   },
 };
 </script>
 
 <style lang="scss">
-@import "../../styles/mixins.scss";
+@import "@/styles/iconfont.scss";
 
 .container {
-  padding: 20rpx;
+  min-height: 100vh;
+  background: #f8f8f8;
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
   .search-bar {
     flex: 1;
-    display: flex;
-    align-items: center;
     height: 72rpx;
     background: #f5f5f5;
     border-radius: 36rpx;
-    padding: 0 30rpx;
+    display: flex;
+    align-items: center;
+    padding: 0 24rpx;
     margin-right: 20rpx;
 
     .icon-search {
       font-size: 32rpx;
       color: #999;
-      margin-right: 10rpx;
+      margin-right: 12rpx;
     }
 
     .search-input {
@@ -199,101 +330,192 @@ export default {
     }
 
     .clear-btn {
-      font-size: 40rpx;
+      width: 48rpx;
+      height: 48rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #999;
-      padding: 0 10rpx;
+      font-size: 36rpx;
     }
   }
 
   .cancel-btn {
     font-size: 28rpx;
     color: #666;
+    padding: 20rpx 0;
   }
 }
 
-.history {
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20rpx;
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 20rpx 20rpx;
 
-    .title {
+  .title {
+    font-size: 28rpx;
+    color: #333;
+    font-weight: 500;
+  }
+
+  .clear-all {
+    font-size: 26rpx;
+    color: #999;
+    padding: 10rpx;
+  }
+}
+
+.history-list {
+  padding: 0 20rpx;
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    height: 88rpx;
+    border-bottom: 1rpx solid #f5f5f5;
+
+    .icon-time {
+      font-size: 32rpx;
+      color: #999;
+      margin-right: 12rpx;
+    }
+
+    .keyword {
+      flex: 1;
       font-size: 28rpx;
       color: #333;
-      font-weight: bold;
     }
 
-    .clear {
-      font-size: 24rpx;
-      color: #999;
-    }
-  }
-
-  .history-list {
-    .history-item {
+    .delete-btn {
+      width: 88rpx;
+      height: 88rpx;
       display: flex;
       align-items: center;
-      padding: 20rpx 0;
-
-      .icon-time {
-        font-size: 28rpx;
-        color: #999;
-        margin-right: 10rpx;
-      }
-
-      .keyword {
-        font-size: 28rpx;
-        color: #333;
-      }
+      justify-content: center;
+      color: #999;
+      font-size: 36rpx;
     }
   }
+}
+
+.hot-list {
+  padding: 0 20rpx;
+
+  .hot-item {
+    display: flex;
+    align-items: center;
+    height: 88rpx;
+    border-bottom: 1rpx solid #f5f5f5;
+
+    .rank {
+      width: 40rpx;
+      font-size: 28rpx;
+      color: #999;
+      text-align: center;
+
+      &.top {
+        color: #ff6b6b;
+        font-weight: bold;
+      }
+    }
+
+    .keyword {
+      flex: 1;
+      font-size: 28rpx;
+      color: #333;
+      margin-left: 20rpx;
+    }
+  }
+}
+
+.search-results {
+  height: calc(100vh - 112rpx);
 }
 
 .result-list {
-  .empty {
-    text-align: center;
-    padding: 60rpx 0;
-    color: #999;
-    font-size: 28rpx;
-  }
+  padding: 20rpx;
 
   .result-item {
-    display: flex;
-    padding: 20rpx 0;
-    border-bottom: 1rpx solid #eee;
+    background: #fff;
+    border-radius: 16rpx;
+    margin-bottom: 20rpx;
+    overflow: hidden;
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
 
     .cover {
-      width: 160rpx;
-      height: 160rpx;
-      border-radius: 12rpx;
-      margin-right: 20rpx;
+      width: 100%;
+      height: 360rpx;
     }
 
     .info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      padding: 20rpx;
 
       .title {
         font-size: 32rpx;
+        font-weight: 600;
         color: #333;
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        margin-bottom: 12rpx;
+        display: block;
       }
 
-      .desc {
-        font-size: 26rpx;
-        color: #999;
+      .description {
+        font-size: 28rpx;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 20rpx;
         display: -webkit-box;
-        -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
         overflow: hidden;
       }
+
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .author {
+          display: flex;
+          align-items: center;
+
+          .avatar {
+            width: 48rpx;
+            height: 48rpx;
+            border-radius: 50%;
+            margin-right: 12rpx;
+          }
+
+          .nickname {
+            font-size: 26rpx;
+            color: #666;
+          }
+        }
+
+        .likes {
+          font-size: 24rpx;
+          color: #999;
+        }
+      }
     }
+  }
+}
+
+.empty-result {
+  padding: 120rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .empty-image {
+    width: 240rpx;
+    height: 240rpx;
+    margin-bottom: 30rpx;
+  }
+
+  .empty-text {
+    font-size: 28rpx;
+    color: #999;
   }
 }
 </style>

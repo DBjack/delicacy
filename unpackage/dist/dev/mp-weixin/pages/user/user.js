@@ -144,8 +144,46 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 28));
-var _toConsumableArray2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/toConsumableArray */ 18));
 var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 31));
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -216,55 +254,61 @@ var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/r
 var _default = {
   data: function data() {
     return {
-      userId: "",
+      isLogin: false,
       userInfo: {},
-      posts: [],
-      page: 1,
-      pageSize: 10,
-      loadMoreStatus: "more",
-      isLoading: false,
-      isFollowing: false,
-      isSelf: false,
-      defaultAvatar: "/static/images/default-avatar.jpg",
-      defaultImage: "/static/images/default-food.jpg"
+      userStats: {},
+      defaultAvatar: "/static/images/avatar-default.png",
+      defaultBg: "/static/images/user-bg.jpg"
     };
   },
-  onLoad: function onLoad(options) {
-    if (options.id) {
-      this.userId = options.id;
-      this.checkIsSelf();
-      this.loadData();
+  onShow: function onShow() {
+    this.checkLogin();
+    if (this.isLogin) {
+      this.loadUserInfo();
+      this.loadUserStats();
     }
   },
-  onPullDownRefresh: function onPullDownRefresh() {
-    this.refreshData();
-  },
-  onReachBottom: function onReachBottom() {
-    this.loadMore();
-  },
   methods: {
-    checkIsSelf: function checkIsSelf() {
-      var currentUser = uni.getStorageSync("userInfo");
-      this.isSelf = currentUser && currentUser._id === this.userId;
+    checkLogin: function checkLogin() {
+      var token = uni.getStorageSync("token");
+      this.isLogin = !!token;
     },
-    loadData: function loadData() {
+    loadUserInfo: function loadUserInfo() {
       var _this = this;
       return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee() {
+        var res;
         return _regenerator.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
-                return Promise.all([_this.loadUserInfo(), _this.loadPosts(), _this.checkFollowStatus()]);
-              case 2:
+                _context.prev = 0;
+                _context.next = 3;
+                return uniCloud.callFunction({
+                  name: "user",
+                  data: {
+                    action: "getInfo"
+                  }
+                });
+              case 3:
+                res = _context.sent;
+                if (res.result.code === 0) {
+                  _this.userInfo = res.result.data;
+                }
+                _context.next = 10;
+                break;
+              case 7:
+                _context.prev = 7;
+                _context.t0 = _context["catch"](0);
+                console.error("获取用户信息失败:", _context.t0);
+              case 10:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee);
+        }, _callee, null, [[0, 7]]);
       }))();
     },
-    loadUserInfo: function loadUserInfo() {
+    loadUserStats: function loadUserStats() {
       var _this2 = this;
       return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2() {
         var res;
@@ -277,252 +321,111 @@ var _default = {
                 return uniCloud.callFunction({
                   name: "user",
                   data: {
-                    action: "getUserInfo",
-                    params: {
-                      userId: _this2.userId
-                    }
+                    action: "getStats"
                   }
                 });
               case 3:
                 res = _context2.sent;
-                if (!(res.result.code === 0)) {
-                  _context2.next = 8;
-                  break;
+                if (res.result.code === 0) {
+                  _this2.userStats = res.result.data;
                 }
-                _this2.userInfo = res.result.data;
-                _context2.next = 9;
+                _context2.next = 10;
                 break;
-              case 8:
-                throw new Error(res.result.msg);
-              case 9:
-                _context2.next = 15;
-                break;
-              case 11:
-                _context2.prev = 11;
+              case 7:
+                _context2.prev = 7;
                 _context2.t0 = _context2["catch"](0);
-                console.error("获取用户信息失败:", _context2.t0);
-                uni.showToast({
-                  title: "获取用户信息失败",
-                  icon: "none"
-                });
-              case 15:
+                console.error("获取用户统计失败:", _context2.t0);
+              case 10:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, null, [[0, 11]]);
+        }, _callee2, null, [[0, 7]]);
       }))();
     },
-    loadPosts: function loadPosts() {
-      var _this3 = this;
-      return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee3() {
-        var res, posts;
-        return _regenerator.default.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                if (!_this3.isLoading) {
-                  _context3.next = 2;
-                  break;
-                }
-                return _context3.abrupt("return");
-              case 2:
-                _this3.isLoading = true;
-                _context3.prev = 3;
-                _context3.next = 6;
-                return uniCloud.callFunction({
-                  name: "post",
-                  data: {
-                    action: "getUserPosts",
-                    params: {
-                      userId: _this3.userId,
-                      page: _this3.page,
-                      pageSize: _this3.pageSize
-                    }
-                  }
-                });
-              case 6:
-                res = _context3.sent;
-                if (!(res.result.code === 0)) {
-                  _context3.next = 13;
-                  break;
-                }
-                posts = res.result.data;
-                if (_this3.page === 1) {
-                  _this3.posts = posts;
-                } else {
-                  _this3.posts = [].concat((0, _toConsumableArray2.default)(_this3.posts), (0, _toConsumableArray2.default)(posts));
-                }
-                _this3.loadMoreStatus = posts.length < _this3.pageSize ? "noMore" : "more";
-                _context3.next = 14;
-                break;
-              case 13:
-                throw new Error(res.result.msg);
-              case 14:
-                _context3.next = 20;
-                break;
-              case 16:
-                _context3.prev = 16;
-                _context3.t0 = _context3["catch"](3);
-                console.error("加载作品列表失败:", _context3.t0);
-                uni.showToast({
-                  title: "加载失败",
-                  icon: "none"
-                });
-              case 20:
-                _context3.prev = 20;
-                _this3.isLoading = false;
-                uni.stopPullDownRefresh();
-                return _context3.finish(20);
-              case 24:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, null, [[3, 16, 20, 24]]);
-      }))();
-    },
-    checkFollowStatus: function checkFollowStatus() {
-      var _this4 = this;
-      return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee4() {
-        var currentUser, res;
-        return _regenerator.default.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                if (!_this4.isSelf) {
-                  _context4.next = 2;
-                  break;
-                }
-                return _context4.abrupt("return");
-              case 2:
-                _context4.prev = 2;
-                currentUser = uni.getStorageSync("userInfo");
-                if (currentUser) {
-                  _context4.next = 6;
-                  break;
-                }
-                return _context4.abrupt("return");
-              case 6:
-                _context4.next = 8;
-                return uniCloud.callFunction({
-                  name: "user",
-                  data: {
-                    action: "checkFollowStatus",
-                    params: {
-                      followerId: currentUser._id,
-                      followingId: _this4.userId
-                    }
-                  }
-                });
-              case 8:
-                res = _context4.sent;
-                if (res.result.code === 0) {
-                  _this4.isFollowing = res.result.data;
-                }
-                _context4.next = 15;
-                break;
-              case 12:
-                _context4.prev = 12;
-                _context4.t0 = _context4["catch"](2);
-                console.error("检查关注状态失败:", _context4.t0);
-              case 15:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, null, [[2, 12]]);
-      }))();
-    },
-    handleFollow: function handleFollow() {
-      var _this5 = this;
-      return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee5() {
-        var currentUser, action, res;
-        return _regenerator.default.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                currentUser = uni.getStorageSync("userInfo");
-                if (currentUser) {
-                  _context5.next = 4;
-                  break;
-                }
-                uni.navigateTo({
-                  url: "/pages/auth/login"
-                });
-                return _context5.abrupt("return");
-              case 4:
-                _context5.prev = 4;
-                action = _this5.isFollowing ? "unfollow" : "follow";
-                _context5.next = 8;
-                return uniCloud.callFunction({
-                  name: "user",
-                  data: {
-                    action: action,
-                    params: {
-                      followerId: currentUser._id,
-                      followingId: _this5.userId
-                    }
-                  }
-                });
-              case 8:
-                res = _context5.sent;
-                if (!(res.result.code === 0)) {
-                  _context5.next = 15;
-                  break;
-                }
-                _this5.isFollowing = !_this5.isFollowing;
-                // 更新粉丝数
-                _this5.userInfo.followersCount += _this5.isFollowing ? 1 : -1;
-                uni.showToast({
-                  title: _this5.isFollowing ? "关注成功" : "取消关注成功",
-                  icon: "success"
-                });
-                _context5.next = 16;
-                break;
-              case 15:
-                throw new Error(res.result.msg);
-              case 16:
-                _context5.next = 22;
-                break;
-              case 18:
-                _context5.prev = 18;
-                _context5.t0 = _context5["catch"](4);
-                console.error("关注操作失败:", _context5.t0);
-                uni.showToast({
-                  title: "操作失败",
-                  icon: "none"
-                });
-              case 22:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5, null, [[4, 18]]);
-      }))();
-    },
-    refreshData: function refreshData() {
-      this.page = 1;
-      this.loadData();
-    },
-    loadMore: function loadMore() {
-      if (this.loadMoreStatus === "noMore") return;
-      this.page++;
-      this.loadPosts();
-    },
-    goToDetail: function goToDetail(id) {
+    editProfile: function editProfile() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
       uni.navigateTo({
-        url: "/packagePost/pages/detail?id=".concat(id)
+        url: "/pages/user/edit-profile"
       });
     },
-    goToFollowers: function goToFollowers() {
+    goToLogin: function goToLogin() {
       uni.navigateTo({
-        url: "/pages/user/followers?id=".concat(this.userId)
+        url: "/pages/auth/login"
+      });
+    },
+    goToMyPosts: function goToMyPosts() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
+      uni.navigateTo({
+        url: "/pages/user/posts"
       });
     },
     goToFollowing: function goToFollowing() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
       uni.navigateTo({
-        url: "/pages/user/following?id=".concat(this.userId)
+        url: "/pages/user/following"
+      });
+    },
+    goToFollowers: function goToFollowers() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
+      uni.navigateTo({
+        url: "/pages/user/followers"
+      });
+    },
+    goToLikes: function goToLikes() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
+      uni.navigateTo({
+        url: "/pages/user/likes"
+      });
+    },
+    goToCollections: function goToCollections() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
+      uni.navigateTo({
+        url: "/pages/user/collections"
+      });
+    },
+    goToDrafts: function goToDrafts() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
+      uni.navigateTo({
+        url: "/pages/user/drafts"
+      });
+    },
+    goToSettings: function goToSettings() {
+      uni.navigateTo({
+        url: "/pages/user/settings"
+      });
+    },
+    contactUs: function contactUs() {
+      uni.showModal({
+        title: "联系我们",
+        content: "如有问题请发送邮件至：support@example.com",
+        showCancel: false
+      });
+    },
+    showAbout: function showAbout() {
+      uni.navigateTo({
+        url: "/pages/about/index"
       });
     }
   }

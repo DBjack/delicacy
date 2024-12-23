@@ -9951,7 +9951,7 @@ var S = "development" === "development",
   k = "true" === undefined || !0 === undefined,
   A = I([]),
   C = "h5" === b ? "web" : "app-plus" === b ? "app" : b,
-  P = I({"address":["127.0.0.1","172.23.192.1","172.21.224.1","172.22.112.1","192.168.11.109"],"servePort":7000,"debugPort":9000,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/software/HBuilderX/plugins/unicloud/**/*.js"]}),
+  P = I({"address":["127.0.0.1","172.23.192.1","172.21.224.1","172.22.112.1","192.168.11.109"],"servePort":7001,"debugPort":9001,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/software/HBuilderX/plugins/unicloud/**/*.js"]}),
   T = I([{"provider":"aliyun","spaceName":"delicacy-cloud","spaceId":"mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e","clientSecret":"s8DmEaWFnpPY+4X3a2wlyA==","endpoint":"https://api.next.bspapp.com"}]) || [],
   x = true;
 var O = "";
@@ -17909,24 +17909,24 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _default = {
   "pages": [{
-    "path": "pages/discover/discover",
-    "style": {
-      "navigationBarTitleText": "美食天地"
-    }
-  }, {
-    "path": "pages/user/user",
-    "style": {
-      "navigationBarTitleText": "我的"
-    }
-  }, {
     "path": "pages/index/index",
     "style": {
       "navigationBarTitleText": "首页"
     }
   }, {
+    "path": "pages/discover/discover",
+    "style": {
+      "navigationBarTitleText": "发现"
+    }
+  }, {
     "path": "pages/publish/publish",
     "style": {
       "navigationBarTitleText": "发布"
+    }
+  }, {
+    "path": "pages/user/user",
+    "style": {
+      "navigationBarTitleText": "我的"
     }
   }],
   "subPackages": [{
@@ -17950,15 +17950,15 @@ var _default = {
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [{
-      "pagePath": "pages/discover/discover",
-      "text": "发现",
-      "iconPath": "static/tabbar/discover.png",
-      "selectedIconPath": "static/tabbar/discover-active.png"
-    }, {
       "pagePath": "pages/index/index",
       "text": "首页",
       "iconPath": "static/tabbar/index.png",
       "selectedIconPath": "static/tabbar/index-active.png"
+    }, {
+      "pagePath": "pages/discover/discover",
+      "text": "发现",
+      "iconPath": "static/tabbar/discover.png",
+      "selectedIconPath": "static/tabbar/discover-active.png"
     }, {
       "pagePath": "pages/publish/publish",
       "text": "发布",

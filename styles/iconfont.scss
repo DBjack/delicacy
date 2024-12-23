@@ -1,0 +1,52 @@
+@font-face {
+  font-family: "iconfont";
+  src: url('/static/fonts/iconfont.ttf') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 32rpx;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-search:before {
+  content: "\e8ef";
+}
+
+.icon-time:before {
+  content: "\e8c5";
+}
+
+.icon-delete:before {
+  content: "\e8b6";
+}
+
+.icon-camera:before {
+  content: "\e8bc";
+}
+
+.icon-home:before {
+  content: "\e8c6";
+}
+
+.icon-dessert:before {
+  content: "\e8c7";
+}
+
+.icon-baking:before {
+  content: "\e8c8";
+}
+
+.icon-drink:before {
+  content: "\e8c9";
+}
+
+.icon-snack:before {
+  content: "\e8ca";
+}
+
+.icon-other:before {
+  content: "\e8cb";
+} 

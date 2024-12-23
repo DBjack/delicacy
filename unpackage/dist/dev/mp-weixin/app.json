@@ -1,9 +1,9 @@
 {
   "pages": [
-    "pages/discover/discover",
-    "pages/user/user",
     "pages/index/index",
-    "pages/publish/publish"
+    "pages/discover/discover",
+    "pages/publish/publish",
+    "pages/user/user"
   ],
   "subPackages": [
     {
@@ -27,16 +27,16 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/discover/discover",
-        "text": "发现",
-        "iconPath": "static/tabbar/discover.png",
-        "selectedIconPath": "static/tabbar/discover-active.png"
-      },
-      {
         "pagePath": "pages/index/index",
         "text": "首页",
         "iconPath": "static/tabbar/index.png",
         "selectedIconPath": "static/tabbar/index-active.png"
+      },
+      {
+        "pagePath": "pages/discover/discover",
+        "text": "发现",
+        "iconPath": "static/tabbar/discover.png",
+        "selectedIconPath": "static/tabbar/discover-active.png"
       },
       {
         "pagePath": "pages/publish/publish",
