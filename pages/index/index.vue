@@ -33,8 +33,9 @@
         >
           <image
             class="food-image"
-            :src="item.cover || defaultImage"
+            :src="item.cover || (item.images && item.images[0]) || defaultImage"
             mode="aspectFill"
+            @error="handleImageError(item)"
           />
           <view class="food-info">
             <text class="food-name">{{ item.title }}</text>
@@ -48,7 +49,10 @@
                 <text class="nickname">{{ item.author.nickname }}</text>
               </view>
               <view class="stats">
-                <text class="likes">{{ formatNumber(item.likeCount) }} 赞</text>
+                <view class="likes">
+                  <text class="iconfont icon-heart"></text>
+                  <text>{{ item.likes }}</text>
+                </view>
               </view>
             </view>
           </view>
@@ -56,25 +60,30 @@
       </view>
 
       <!-- 加载更多 -->
-      <uni-load-more :status="loadMoreStatus"></uni-load-more>
+      <load-more :status="loadMoreStatus" v-if="foodList.length"></load-more>
     </scroll-view>
   </view>
 </template>
 
 <script>
+import LoadMore from "@/components/load-more/load-more.vue";
+
 export default {
+  components: {
+    LoadMore,
+  },
   data() {
     return {
       categories: [
         { id: "all", name: "全部" },
         { id: "hot", name: "热门" },
         { id: "new", name: "最新" },
-        { id: "chinese", name: "中餐" },
-        { id: "western", name: "西餐" },
-        { id: "japanese", name: "日料" },
-        { id: "korean", name: "韩餐" },
+        { id: "home", name: "家常菜" },
         { id: "dessert", name: "甜点" },
+        { id: "baking", name: "烘焙" },
         { id: "drink", name: "饮品" },
+        { id: "snack", name: "小吃" },
+        { id: "other", name: "其他" },
       ],
       currentCategory: "all",
       foodList: [],
@@ -83,8 +92,8 @@ export default {
       loadMoreStatus: "more",
       isRefreshing: false,
       isLoading: false,
-      defaultImage: "/static/images/default-food.jpg",
-      defaultAvatar: "/static/images/default-avatar.png",
+      defaultImage: "https://img.icons8.com/color/512/food.png",
+      defaultAvatar: "https://img.icons8.com/color/512/user.png",
     };
   },
 
@@ -93,6 +102,19 @@ export default {
   },
 
   methods: {
+    handleImageError(item) {
+      console.log("图片加载失败:", item);
+      // 如果封面图加载失败，使用默认图片
+      if (
+        item.cover &&
+        item.images &&
+        item.images.length > 0 &&
+        item.cover === item.images[0]
+      ) {
+        item.cover = this.defaultImage;
+      }
+    },
+
     async loadFoodList() {
       if (this.isLoading) return;
       this.isLoading = true;
@@ -117,6 +139,10 @@ export default {
           } else {
             this.foodList = [...this.foodList, ...posts];
           }
+
+          // 打印检查数据
+          console.log("加载的数据:", posts);
+
           this.loadMoreStatus =
             posts.length < this.pageSize ? "noMore" : "more";
         } else {
@@ -182,6 +208,8 @@ export default {
 .container {
   min-height: 100vh;
   background: #f8f8f8;
+  display: flex;
+  flex-direction: column;
 }
 
 .category-scroll {
@@ -191,6 +219,7 @@ export default {
   top: 0;
   z-index: 100;
   box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 
   .category-list {
     display: flex;
@@ -225,14 +254,17 @@ export default {
 }
 
 .content-scroll {
-  height: calc(100vh - 112rpx);
+  flex: 1;
+  height: 0;
   padding: 20rpx;
+  box-sizing: border-box;
 }
 
 .food-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20rpx;
+  padding-bottom: 120rpx;
 
   .food-item {
     background: #fff;
@@ -270,12 +302,14 @@ export default {
           display: flex;
           align-items: center;
           flex: 1;
+          min-width: 0;
 
           .avatar {
             width: 40rpx;
             height: 40rpx;
             border-radius: 50%;
             margin-right: 8rpx;
+            flex-shrink: 0;
           }
 
           .nickname {
@@ -287,6 +321,7 @@ export default {
         }
 
         .stats {
+          flex-shrink: 0;
           .likes {
             font-size: 24rpx;
             color: #999;

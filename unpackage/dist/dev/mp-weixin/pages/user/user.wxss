@@ -112,54 +112,58 @@
 }
 .user-header .user-stats .stat-item {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
 }
 .user-header .user-stats .stat-item .count {
-  font-size: 36rpx;
-  font-weight: 600;
+  font-size: 32rpx;
   color: #333;
-  margin-bottom: 8rpx;
+  font-weight: 600;
+  margin-bottom: 4rpx;
+  display: block;
 }
 .user-header .user-stats .stat-item .label {
   font-size: 24rpx;
-  color: #999;
+  color: #666;
 }
-.menu-section .menu-group {
+.menu-list {
   background: #fff;
   margin-bottom: 20rpx;
 }
-.menu-section .menu-group .menu-item {
+.menu-list .menu-item {
   display: flex;
   align-items: center;
   padding: 30rpx;
   border-bottom: 1rpx solid #f5f5f5;
 }
-.menu-section .menu-group .menu-item:last-child {
+.menu-list .menu-item:last-child {
   border-bottom: none;
 }
-.menu-section .menu-group .menu-item .icon-wrap {
-  width: 48rpx;
-  height: 48rpx;
-  background: #ff6b6b;
-  border-radius: 12rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.menu-list .menu-item .iconfont {
+  font-size: 40rpx;
+  color: #666;
   margin-right: 20rpx;
 }
-.menu-section .menu-group .menu-item .icon-wrap .iconfont {
-  color: #fff;
-  font-size: 28rpx;
+.menu-list .menu-item .iconfont.icon-arrow-right {
+  margin-right: 0;
+  margin-left: auto;
+  font-size: 32rpx;
+  color: #999;
 }
-.menu-section .menu-group .menu-item .title {
-  flex: 1;
+.menu-list .menu-item .title {
   font-size: 30rpx;
   color: #333;
 }
-.menu-section .menu-group .menu-item .icon-arrow {
-  font-size: 28rpx;
+.edit-btn .iconfont {
+  font-size: 24rpx;
+  color: #fff;
+}
+.menu-item .left .iconfont {
+  font-size: 32rpx;
+  color: #666;
+  margin-right: 20rpx;
+}
+.menu-item .iconfont.icon-right {
+  font-size: 24rpx;
   color: #999;
 }
 

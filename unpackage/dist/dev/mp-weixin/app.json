@@ -3,9 +3,24 @@
     "pages/index/index",
     "pages/discover/discover",
     "pages/publish/publish",
-    "pages/user/user"
+    "pages/user/user",
+    "pages/auth/login",
+    "pages/search/index"
   ],
   "subPackages": [
+    {
+      "root": "packageUser",
+      "pages": [
+        "pages/edit-profile/edit-profile",
+        "pages/settings/settings",
+        "pages/following/following",
+        "pages/followers/followers",
+        "pages/likes/likes",
+        "pages/collections/collections",
+        "pages/drafts/drafts",
+        "pages/posts/posts"
+      ]
+    },
     {
       "root": "packagePost",
       "pages": [
@@ -16,9 +31,9 @@
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "美食天地",
+    "navigationBarTitleText": "美食分享",
     "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#f8f8f8"
+    "backgroundColor": "#F8F8F8"
   },
   "tabBar": {
     "color": "#999999",
@@ -29,8 +44,8 @@
       {
         "pagePath": "pages/index/index",
         "text": "首页",
-        "iconPath": "static/tabbar/index.png",
-        "selectedIconPath": "static/tabbar/index-active.png"
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
       },
       {
         "pagePath": "pages/discover/discover",
@@ -56,9 +71,16 @@
     "getLocation"
   ],
   "permission": {
-    "scope.userInfo": {
-      "desc": "用于完善用户资料"
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
     }
+  },
+  "lazyCodeLoading": "requiredComponents",
+  "plugins": {},
+  "functionalPages": false,
+  "icons": {
+    "logo": "/static/logo.png",
+    "share": "/static/mp-weixin/share-logo.png"
   },
   "usingComponents": {}
 }

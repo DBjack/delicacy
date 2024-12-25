@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "喜欢",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "load-more": "/components/load-more/load-more"
+  }
+}

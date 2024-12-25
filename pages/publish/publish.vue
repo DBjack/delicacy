@@ -27,7 +27,13 @@
             v-for="(image, index) in formData.images"
             :key="index"
           >
-            <image :src="image" mode="aspectFill" @tap="previewImage(index)" />
+            <image
+              :src="image"
+              mode="aspectFill"
+              @tap="previewImage(index)"
+              @load="onImageLoad"
+              @error="onImageError"
+            />
             <view class="mask">
               <view class="delete-btn" @tap.stop="deleteImage(index)">
                 <text class="iconfont icon-delete"></text>
@@ -70,7 +76,7 @@
             :class="{ active: formData.category === item.value }"
             @tap="selectCategory(item.value)"
           >
-            <text class="iconfont" :class="item.icon"></text>
+            <text class="iconfont" :class="'icon-' + item.icon"></text>
             <text>{{ item.label }}</text>
           </view>
         </view>
@@ -87,9 +93,10 @@
             :class="{ active: formData.tags.includes(tag.value) }"
             @tap="toggleTag(tag.value)"
           >
-            <text class="tag-icon" v-if="formData.tags.includes(tag.value)"
-              >✓</text
-            >
+            <text
+              v-if="formData.tags.includes(tag.value)"
+              class="iconfont icon-check"
+            ></text>
             {{ tag.label }}
           </view>
         </view>
@@ -116,6 +123,7 @@
 
 <script>
 export default {
+  components: {},
   data() {
     return {
       formData: {
@@ -127,12 +135,12 @@ export default {
         status: 1,
       },
       categories: [
-        { label: "家常菜", value: "home", icon: "icon-home" },
-        { label: "甜点", value: "dessert", icon: "icon-dessert" },
-        { label: "烘焙", value: "baking", icon: "icon-baking" },
-        { label: "饮品", value: "drink", icon: "icon-drink" },
-        { label: "小吃", value: "snack", icon: "icon-snack" },
-        { label: "其他", value: "other", icon: "icon-other" },
+        { label: "家常菜", value: "home", icon: "home" },
+        { label: "甜点", value: "dessert", icon: "star" },
+        { label: "烘焙", value: "baking", icon: "fire" },
+        { label: "饮品", value: "drink", icon: "gift" },
+        { label: "小吃", value: "snack", icon: "shop" },
+        { label: "其他", value: "other", icon: "more" },
       ],
       tagOptions: [
         { label: "快手菜", value: "quick" },
@@ -188,34 +196,107 @@ export default {
 
     async chooseImage() {
       try {
+        console.log("开始选择图片");
         const res = await uni.chooseImage({
           count: 9 - this.formData.images.length,
           sizeType: ["compressed"],
           sourceType: ["album", "camera"],
         });
 
+        console.log("选择图片结果:", res);
+
+        // 获取临时文件路径
+        let tempFilePaths;
+        if (Array.isArray(res)) {
+          // 处理数组返回结果
+          const validResult = res.find((item) => item && item.tempFilePaths);
+          tempFilePaths = validResult?.tempFilePaths;
+        } else {
+          // 直接使用返回结果
+          tempFilePaths = res.tempFilePaths;
+        }
+
+        if (!tempFilePaths || !tempFilePaths.length) {
+          console.log("未获取到图片路径");
+          return;
+        }
+
+        console.log("获取到的图片路径:", tempFilePaths);
+
         uni.showLoading({
           title: "上传中...",
           mask: true,
         });
 
-        for (let tempFile of res.tempFilePaths) {
-          const uploadRes = await uniCloud.uploadFile({
-            filePath: tempFile,
-            cloudPath: `posts/${Date.now()}-${Math.random()
+        try {
+          // 逐个上传图片
+          for (let i = 0; i < tempFilePaths.length; i++) {
+            const filePath = tempFilePaths[i];
+            const extension = filePath.split(".").pop().toLowerCase();
+            const cloudPath = `posts/${Date.now()}-${Math.random()
               .toString(36)
-              .slice(-6)}.${tempFile.split(".").pop()}`,
-          });
-          this.formData.images.push(uploadRes.fileID);
-        }
+              .slice(-6)}.${extension}`;
 
-        uni.hideLoading();
+            console.log("准备上传图片:", { filePath, cloudPath });
+
+            // 先将临时文件保存到本地
+            const savedFilePath = await new Promise((resolve, reject) => {
+              uni.saveFile({
+                tempFilePath: filePath,
+                success: (res) => {
+                  console.log("文件保存成功:", res);
+                  resolve(res.savedFilePath);
+                },
+                fail: (err) => {
+                  console.error("文件保存失败:", err);
+                  reject(err);
+                },
+              });
+            });
+
+            console.log("文件已保存到:", savedFilePath);
+
+            // 上传已保存的文件
+            const uploadRes = await uniCloud.uploadFile({
+              filePath: savedFilePath,
+              cloudPath,
+            });
+
+            console.log("图片上传成功:", uploadRes);
+
+            // 将上传成功的图片添加到图片列表中
+            this.formData.images.push(uploadRes.fileID);
+
+            // 删除保存的临时文件
+            uni.removeSavedFile({
+              filePath: savedFilePath,
+              complete: () => {
+                console.log("临时文件已删除");
+              },
+            });
+          }
+
+          console.log("所有图片上传完成，当前图片列表:", this.formData.images);
+
+          uni.showToast({
+            title: "上传成功",
+            icon: "success",
+          });
+        } catch (uploadError) {
+          console.error("图片上传失败:", uploadError);
+          uni.showToast({
+            title: uploadError.message || "图片上传失败，请重试",
+            icon: "none",
+          });
+        }
       } catch (error) {
-        uni.hideLoading();
+        console.error("选择图片失败:", error);
         uni.showToast({
-          title: "上传失败，请重试",
+          title: error.message || "选择图片失败",
           icon: "none",
         });
+      } finally {
+        uni.hideLoading();
       }
     },
 
@@ -361,6 +442,18 @@ export default {
         this.isSubmitting = false;
       }
     },
+
+    onImageLoad(e) {
+      console.log("图片加载成功:", e);
+    },
+
+    onImageError(e) {
+      console.error("图片加载失败:", e);
+      uni.showToast({
+        title: "图片加载失败",
+        icon: "none",
+      });
+    },
   },
 };
 </script>
@@ -371,6 +464,7 @@ export default {
   background: #f8f8f8;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+  position: relative;
 }
 
 .progress-bar {
@@ -380,7 +474,7 @@ export default {
   right: 0;
   height: 4rpx;
   background: #f0f0f0;
-  z-index: 100;
+  z-index: 99;
 
   .progress {
     height: 100%;
@@ -391,6 +485,8 @@ export default {
 
 .content {
   padding: 30rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .form-item {
@@ -398,6 +494,8 @@ export default {
   border-radius: 16rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .title-input {
@@ -416,6 +514,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   margin: 0 -8rpx;
+  position: relative;
+  z-index: 1;
 
   .image-item {
     position: relative;
@@ -462,7 +562,7 @@ export default {
         align-items: center;
         justify-content: center;
 
-        .icon-delete {
+        .iconfont {
           color: #fff;
           font-size: 24rpx;
         }
@@ -500,7 +600,7 @@ export default {
       padding-top: 100%;
     }
 
-    .icon-camera {
+    .iconfont {
       font-size: 48rpx;
       color: #999;
       margin-bottom: 8rpx;
@@ -533,6 +633,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   margin: 0 -8rpx;
+  position: relative;
+  z-index: 10;
 
   .category-item {
     width: calc(33.33% - 16rpx);
@@ -545,27 +647,55 @@ export default {
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ff6b6b;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1;
+    }
 
     .iconfont {
       font-size: 32rpx;
       color: #666;
       margin-bottom: 4rpx;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s;
     }
 
     text {
       font-size: 24rpx;
       color: #666;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s;
     }
 
     &.active {
-      background: #ff6b6b;
       transform: translateY(-2rpx);
       box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+
+      &::after {
+        opacity: 1;
+      }
 
       .iconfont,
       text {
         color: #fff;
       }
+    }
+
+    &:active {
+      transform: scale(0.95);
     }
   }
 }
@@ -574,6 +704,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   margin: 0 -8rpx 16rpx;
+  position: relative;
+  z-index: 1;
 
   .tag {
     margin: 8rpx;
@@ -591,10 +723,15 @@ export default {
       color: #fff;
       transform: translateY(-2rpx);
       box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+
+      .iconfont {
+        color: #fff;
+        margin-right: 6rpx;
+        font-size: 24rpx;
+      }
     }
 
-    .tag-icon {
-      margin-right: 6rpx;
+    .iconfont {
       font-size: 24rpx;
     }
   }
@@ -625,6 +762,8 @@ export default {
   box-shadow: 0 -2rpx 20rpx rgba(0, 0, 0, 0.05);
   display: flex;
   gap: 20rpx;
+  position: relative;
+  z-index: 1;
 
   button {
     flex: 1;
@@ -655,6 +794,24 @@ export default {
     &:not(.disabled):active {
       transform: translateY(2rpx);
       opacity: 0.9;
+    }
+  }
+}
+
+.category-item {
+  &.active {
+    .iconfont {
+      color: #fff;
+    }
+  }
+}
+
+.tag {
+  &.active {
+    .iconfont {
+      color: #fff;
+      margin-right: 6rpx;
+      font-size: 24rpx;
     }
   }
 }

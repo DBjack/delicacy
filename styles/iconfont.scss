@@ -3,12 +3,94 @@
   src: url('/static/fonts/iconfont.ttf') format('truetype');
 }
 
+/* 图标基础样式 */
 .iconfont {
   font-family: "iconfont" !important;
-  font-size: 32rpx;
+  font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 图标大小 */
+.icon-lg {
+  font-size: 48rpx;
+}
+
+.icon-md {
+  font-size: 36rpx;
+}
+
+.icon-sm {
+  font-size: 24rpx;
+}
+
+/* 图标颜色 */
+.icon-primary {
+  color: #ff6b6b;
+}
+
+.icon-success {
+  color: #52c41a;
+}
+
+.icon-warning {
+  color: #faad14;
+}
+
+.icon-danger {
+  color: #ff4d4f;
+}
+
+.icon-info {
+  color: #1890ff;
+}
+
+.icon-dark {
+  color: #333333;
+}
+
+.icon-light {
+  color: #999999;
+}
+
+/* 图标动画 */
+.icon-spin {
+  animation: icon-spin 1s infinite linear;
+}
+
+@keyframes icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 图标间距 */
+.icon-mr-sm {
+  margin-right: 4rpx;
+}
+
+.icon-mr {
+  margin-right: 8rpx;
+}
+
+.icon-mr-lg {
+  margin-right: 12rpx;
+}
+
+.icon-ml-sm {
+  margin-left: 4rpx;
+}
+
+.icon-ml {
+  margin-left: 8rpx;
+}
+
+.icon-ml-lg {
+  margin-left: 12rpx;
 }
 
 .icon-search:before {

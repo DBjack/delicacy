@@ -1,5 +1,7 @@
 {
+  "spaceId": "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
+  "functionRoot": "uniCloud-aliyun/cloudfunctions",
   "mp-weixin": {
-    "clientSecret": "s8DmEaWFnpPY+4X3a2wlyA=="
+    "functionRoot": "uniCloud-aliyun/cloudfunctions"
   }
 } 

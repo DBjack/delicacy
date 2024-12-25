@@ -56,12 +56,17 @@
         </view>
       </view>
     </view>
-    <uni-load-more :status="loadMoreStatus"></uni-load-more>
+    <load-more :status="loadMoreStatus"></load-more>
   </view>
 </template>
 
 <script>
+import LoadMore from "@/components/load-more/load-more.vue";
+
 export default {
+  components: {
+    LoadMore,
+  },
   data() {
     return {
       posts: [],

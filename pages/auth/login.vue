@@ -1,16 +1,24 @@
 <template>
-  <view class="container">
+  <view class="login">
     <view class="header">
-      <image class="logo" src="/static/images/logo.png" mode="aspectFit" />
-      <text class="title">美食天地</text>
-      <text class="subtitle">发现美食，分享生活</text>
+      <image class="logo" src="/static/logo.png" mode="aspectFit" />
+      <text class="title">美食分享</text>
+      <text class="subtitle">分享美食，分享生活</text>
     </view>
 
-    <view class="login-box">
-      <button class="login-btn" @tap="handleLogin" :loading="isLoading">
-        微信一键登录
-      </button>
-      <text class="tips">登录后即可发布内容和参与互动</text>
+    <button
+      class="login-btn"
+      open-type="getUserInfo"
+      @getuserinfo="handleLogin"
+    >
+      微信一键登录
+    </button>
+
+    <view class="tips">
+      <text class="tip-text">登录即表示同意</text>
+      <text class="link">《用户协议》</text>
+      <text class="tip-text">和</text>
+      <text class="link">《隐私政策》</text>
     </view>
   </view>
 </template>
@@ -19,78 +27,60 @@
 export default {
   data() {
     return {
-      isLoading: false,
+      loading: false,
     };
   },
 
   methods: {
-    async handleLogin() {
-      if (this.isLoading) return;
-      this.isLoading = true;
+    async handleLogin(e) {
+      if (this.loading) return;
 
       try {
-        // 1. 获取用户信息
-        const userProfile = await new Promise((resolve, reject) => {
-          uni.getUserProfile({
-            desc: "用于完善用户资料",
-            success: resolve,
-            fail: reject,
-          });
-        });
+        this.loading = true;
 
-        // 2. 获取登录code
-        const loginRes = await uni.login({
-          provider: "weixin",
-        });
+        // 获取用户信息
+        const userInfo = e.detail.userInfo;
+        if (!userInfo) {
+          throw new Error("用户拒绝授权");
+        }
 
-        if (!loginRes.code) {
+        // 获取登录code
+        const { code } = await uni.login();
+        if (!code) {
           throw new Error("获取登录凭证失败");
         }
 
-        // 3. 调用云函数登录
-        const res = await uniCloud.callFunction({
+        console.log("开始调用登录云函数...");
+        const { result } = await uniCloud.callFunction({
           name: "user",
           data: {
             action: "login",
             params: {
-              code: loginRes.code,
-              userInfo: {
-                nickName: userProfile.userInfo.nickName,
-                avatarUrl: userProfile.userInfo.avatarUrl,
-                gender: userProfile.userInfo.gender,
-                country: userProfile.userInfo.country,
-                province: userProfile.userInfo.province,
-                city: userProfile.userInfo.city,
-              },
+              code,
+              userInfo,
             },
           },
         });
 
-        if (res.result.code !== 0) {
-          throw new Error(res.result.msg || "登录失败");
-        }
+        console.log("登录结果:", result);
 
-        // 4. 保存登录状态
-        uni.setStorageSync("token", res.result.data._id);
-        uni.setStorageSync("userInfo", res.result.data);
+        if (result.code === 0 && result.data) {
+          // 保存用户信息
+          getApp().globalData.userInfo = result.data;
+          uni.setStorageSync("userInfo", result.data);
 
-        // 5. 显示成功提示
-        uni.showToast({
-          title: "登录成功",
-          icon: "success",
-        });
+          uni.showToast({
+            title: "登录成功",
+            icon: "success",
+          });
 
-        // 6. 延迟跳转
-        setTimeout(() => {
-          const pages = getCurrentPages();
-          if (pages.length > 1) {
+          // 返回上一页
+          setTimeout(() => {
             uni.navigateBack();
-          } else {
-            uni.switchTab({
-              url: "/pages/index/index",
-            });
-          }
-        }, 1500);
+          }, 1500);
+        } else {
+          throw new Error(result.msg || "登录失败");
+        }
       } catch (error) {
         console.error("登录失败:", error);
         uni.showToast({
@@ -98,7 +88,7 @@ export default {
           icon: "none",
         });
       } finally {
-        this.isLoading = false;
+        this.loading = false;
       }
     },
   },
@@ -106,74 +96,68 @@ export default {
 </script>
 
 <style lang="scss">
-page {
-  background: #fff;
-}
-
-.container {
+.login {
   min-height: 100vh;
+  padding: 60rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 120rpx 40rpx 40rpx;
-  box-sizing: border-box;
-}
+  background-color: #fff;
 
-.header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 80rpx;
+  .header {
+    margin-top: 100rpx;
+    margin-bottom: 100rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-  .logo {
-    width: 200rpx;
-    height: 200rpx;
-    margin-bottom: 30rpx;
+    .logo {
+      width: 160rpx;
+      height: 160rpx;
+      margin-bottom: 40rpx;
+    }
+
+    .title {
+      font-size: 48rpx;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20rpx;
+    }
+
+    .subtitle {
+      font-size: 28rpx;
+      color: #999;
+    }
   }
-
-  .title {
-    font-size: 48rpx;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 16rpx;
-  }
-
-  .subtitle {
-    font-size: 28rpx;
-    color: #999;
-  }
-}
-
-.login-box {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 
   .login-btn {
     width: 100%;
     height: 88rpx;
     line-height: 88rpx;
-    background: #ff6b6b;
+    background: #07c160;
     color: #fff;
     font-size: 32rpx;
     border-radius: 44rpx;
-    margin-bottom: 30rpx;
+    margin-bottom: 40rpx;
 
-    &::after {
-      border: none;
-    }
-
-    &[loading] {
-      opacity: 0.8;
-      background: #ff6b6b;
-      color: #fff;
+    &:active {
+      opacity: 0.9;
     }
   }
 
   .tips {
     font-size: 24rpx;
     color: #999;
+    text-align: center;
+
+    .tip-text {
+      margin: 0 4rpx;
+    }
+
+    .link {
+      color: #07c160;
+      display: inline;
+    }
   }
 }
 </style>

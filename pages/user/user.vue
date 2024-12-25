@@ -1,104 +1,106 @@
 <template>
   <view class="container">
-    <!-- 用户信息区域 -->
     <view class="user-header">
       <view class="bg-wrap">
         <image
           class="bg-image"
-          :src="userInfo.bgImage || defaultBg"
+          src="https://img.icons8.com/color/512/food-background.png"
           mode="aspectFill"
         />
         <view class="bg-mask"></view>
       </view>
+
       <view class="user-info">
-        <view class="avatar-wrap" @tap="editProfile">
+        <view
+          class="avatar-wrap"
+          @tap="isLogin ? goToEditProfile() : goToLogin()"
+        >
           <image
             class="avatar"
-            :src="userInfo.avatar || defaultAvatar"
+            :src="
+              userInfo.avatar || 'https://img.icons8.com/color/512/user.png'
+            "
             mode="aspectFill"
           />
-          <view class="edit-badge">
+          <view class="edit-badge" v-if="isLogin">
             <text class="iconfont icon-edit"></text>
           </view>
         </view>
+
         <view class="info-content" v-if="isLogin">
-          <text class="nickname">{{ userInfo.nickname || "美食达人" }}</text>
+          <text class="nickname">{{ userInfo.nickname || "美食家" }}</text>
           <text class="signature">{{
-            userInfo.signature || "这个人很懒，什么都没写~"
+            userInfo.bio || "这个人很懒，什么都没写~"
           }}</text>
         </view>
-        <view class="login-btn" v-else @tap="goToLogin">
-          <text>登录/注册</text>
-        </view>
+        <text v-else class="login-btn" @tap="goToLogin">点击登录</text>
       </view>
+
       <view class="user-stats">
-        <view class="stat-item" @tap="goToMyPosts">
-          <text class="count">{{ userStats.postCount || 0 }}</text>
-          <text class="label">发布</text>
-        </view>
         <view class="stat-item" @tap="goToFollowing">
-          <text class="count">{{ userStats.followingCount || 0 }}</text>
+          <text class="count">{{ userInfo.followingCount || 0 }}</text>
           <text class="label">关注</text>
         </view>
         <view class="stat-item" @tap="goToFollowers">
-          <text class="count">{{ userStats.followerCount || 0 }}</text>
+          <text class="count">{{ userInfo.followerCount || 0 }}</text>
           <text class="label">粉丝</text>
         </view>
         <view class="stat-item" @tap="goToLikes">
-          <text class="count">{{ userStats.likeCount || 0 }}</text>
+          <text class="count">{{ userInfo.likeCount || 0 }}</text>
           <text class="label">获赞</text>
         </view>
       </view>
     </view>
 
-    <!-- 功能菜单 -->
-    <view class="menu-section">
-      <view class="menu-group">
-        <view class="menu-item" @tap="goToMyPosts">
-          <view class="icon-wrap">
-            <text class="iconfont icon-post"></text>
-          </view>
-          <text class="title">我的发布</text>
-          <text class="iconfont icon-arrow"></text>
+    <view class="menu-list">
+      <view class="menu-item" @tap="goToPosts">
+        <view class="left">
+          <text class="iconfont icon-list"></text>
+          <text>我的帖子</text>
         </view>
-        <view class="menu-item" @tap="goToCollections">
-          <view class="icon-wrap">
-            <text class="iconfont icon-star"></text>
-          </view>
-          <text class="title">我的收藏</text>
-          <text class="iconfont icon-arrow"></text>
-        </view>
-        <view class="menu-item" @tap="goToDrafts">
-          <view class="icon-wrap">
-            <text class="iconfont icon-draft"></text>
-          </view>
-          <text class="title">草稿箱</text>
-          <text class="iconfont icon-arrow"></text>
-        </view>
+        <text class="iconfont icon-right"></text>
       </view>
 
-      <view class="menu-group">
-        <view class="menu-item" @tap="goToSettings">
-          <view class="icon-wrap">
-            <text class="iconfont icon-settings"></text>
-          </view>
-          <text class="title">设置</text>
-          <text class="iconfont icon-arrow"></text>
+      <view class="menu-item" @tap="goToCollections">
+        <view class="left">
+          <text class="iconfont icon-star"></text>
+          <text>我的收藏</text>
         </view>
-        <view class="menu-item" @tap="contactUs">
-          <view class="icon-wrap">
-            <text class="iconfont icon-service"></text>
-          </view>
-          <text class="title">联系我们</text>
-          <text class="iconfont icon-arrow"></text>
+        <text class="iconfont icon-right"></text>
+      </view>
+
+      <view class="menu-item" @tap="goToDrafts">
+        <view class="left">
+          <text class="iconfont icon-file"></text>
+          <text>草稿箱</text>
         </view>
-        <view class="menu-item" @tap="showAbout">
-          <view class="icon-wrap">
-            <text class="iconfont icon-about"></text>
-          </view>
-          <text class="title">关于我们</text>
-          <text class="iconfont icon-arrow"></text>
+        <text class="iconfont icon-right"></text>
+      </view>
+    </view>
+
+    <view class="menu-list">
+      <view class="menu-item" @tap="goToSettings">
+        <view class="left">
+          <text class="iconfont icon-setting"></text>
+          <text>设置</text>
         </view>
+        <text class="iconfont icon-right"></text>
+      </view>
+
+      <view class="menu-item" @tap="contactUs">
+        <view class="left">
+          <text class="iconfont icon-message"></text>
+          <text>联系我们</text>
+        </view>
+        <text class="iconfont icon-right"></text>
+      </view>
+
+      <view class="menu-item" @tap="goToAbout">
+        <view class="left">
+          <text class="iconfont icon-info"></text>
+          <text>关于我们</text>
+        </view>
+        <text class="iconfont icon-right"></text>
       </view>
     </view>
   </view>
@@ -106,70 +108,25 @@
 
 <script>
 export default {
+  components: {},
   data() {
     return {
-      isLogin: false,
       userInfo: {},
-      userStats: {},
-      defaultAvatar: "/static/images/avatar-default.png",
-      defaultBg: "/static/images/user-bg.jpg",
+      isLogin: false,
     };
   },
 
   onShow() {
-    this.checkLogin();
-    if (this.isLogin) {
-      this.loadUserInfo();
-      this.loadUserStats();
-    }
+    this.checkLoginStatus();
   },
 
   methods: {
-    checkLogin() {
-      const token = uni.getStorageSync("token");
-      this.isLogin = !!token;
-    },
-
-    async loadUserInfo() {
-      try {
-        const res = await uniCloud.callFunction({
-          name: "user",
-          data: {
-            action: "getInfo",
-          },
-        });
-        if (res.result.code === 0) {
-          this.userInfo = res.result.data;
-        }
-      } catch (error) {
-        console.error("获取用户信息失败:", error);
+    checkLoginStatus() {
+      const userInfo = uni.getStorageSync("userInfo");
+      this.isLogin = !!userInfo;
+      if (userInfo) {
+        this.userInfo = userInfo;
       }
-    },
-
-    async loadUserStats() {
-      try {
-        const res = await uniCloud.callFunction({
-          name: "user",
-          data: {
-            action: "getStats",
-          },
-        });
-        if (res.result.code === 0) {
-          this.userStats = res.result.data;
-        }
-      } catch (error) {
-        console.error("获取用户统计失败:", error);
-      }
-    },
-
-    editProfile() {
-      if (!this.isLogin) {
-        this.goToLogin();
-        return;
-      }
-      uni.navigateTo({
-        url: "/pages/user/edit-profile",
-      });
     },
 
     goToLogin() {
@@ -178,13 +135,13 @@ export default {
       });
     },
 
-    goToMyPosts() {
+    goToEditProfile() {
       if (!this.isLogin) {
         this.goToLogin();
         return;
       }
       uni.navigateTo({
-        url: "/pages/user/posts",
+        url: "/packageUser/pages/edit-profile/edit-profile",
       });
     },
 
@@ -194,7 +151,7 @@ export default {
         return;
       }
       uni.navigateTo({
-        url: "/pages/user/following",
+        url: "/packageUser/pages/following/following",
       });
     },
 
@@ -204,7 +161,17 @@ export default {
         return;
       }
       uni.navigateTo({
-        url: "/pages/user/followers",
+        url: "/packageUser/pages/followers/followers",
+      });
+    },
+
+    goToPosts() {
+      if (!this.isLogin) {
+        this.goToLogin();
+        return;
+      }
+      uni.navigateTo({
+        url: "/packageUser/pages/posts/posts",
       });
     },
 
@@ -214,7 +181,7 @@ export default {
         return;
       }
       uni.navigateTo({
-        url: "/pages/user/likes",
+        url: "/packageUser/pages/likes/likes",
       });
     },
 
@@ -224,7 +191,7 @@ export default {
         return;
       }
       uni.navigateTo({
-        url: "/pages/user/collections",
+        url: "/packageUser/pages/collections/collections",
       });
     },
 
@@ -234,13 +201,13 @@ export default {
         return;
       }
       uni.navigateTo({
-        url: "/pages/user/drafts",
+        url: "/packageUser/pages/drafts/drafts",
       });
     },
 
     goToSettings() {
       uni.navigateTo({
-        url: "/pages/user/settings",
+        url: "/packageUser/pages/settings/settings",
       });
     },
 
@@ -252,9 +219,9 @@ export default {
       });
     },
 
-    showAbout() {
+    goToAbout() {
       uni.navigateTo({
-        url: "/pages/about/index",
+        url: "/packageUser/pages/about/about",
       });
     },
   },
@@ -368,67 +335,77 @@ export default {
 
     .stat-item {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      text-align: center;
 
       .count {
-        font-size: 36rpx;
-        font-weight: 600;
+        font-size: 32rpx;
         color: #333;
-        margin-bottom: 8rpx;
+        font-weight: 600;
+        margin-bottom: 4rpx;
+        display: block;
       }
 
       .label {
         font-size: 24rpx;
-        color: #999;
+        color: #666;
       }
     }
   }
 }
 
-.menu-section {
-  .menu-group {
-    background: #fff;
-    margin-bottom: 20rpx;
+.menu-list {
+  background: #fff;
+  margin-bottom: 20rpx;
 
-    .menu-item {
-      display: flex;
-      align-items: center;
-      padding: 30rpx;
-      border-bottom: 1rpx solid #f5f5f5;
+  .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 30rpx;
+    border-bottom: 1rpx solid #f5f5f5;
 
-      &:last-child {
-        border-bottom: none;
-      }
+    &:last-child {
+      border-bottom: none;
+    }
 
-      .icon-wrap {
-        width: 48rpx;
-        height: 48rpx;
-        background: #ff6b6b;
-        border-radius: 12rpx;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 20rpx;
+    .iconfont {
+      font-size: 40rpx;
+      color: #666;
+      margin-right: 20rpx;
 
-        .iconfont {
-          color: #fff;
-          font-size: 28rpx;
-        }
-      }
-
-      .title {
-        flex: 1;
-        font-size: 30rpx;
-        color: #333;
-      }
-
-      .icon-arrow {
-        font-size: 28rpx;
+      &.icon-arrow-right {
+        margin-right: 0;
+        margin-left: auto;
+        font-size: 32rpx;
         color: #999;
       }
     }
+
+    .title {
+      font-size: 30rpx;
+      color: #333;
+    }
+  }
+}
+
+.edit-btn {
+  .iconfont {
+    font-size: 24rpx;
+    color: #fff;
+  }
+}
+
+.menu-item {
+  .left {
+    .iconfont {
+      font-size: 32rpx;
+      color: #666;
+      margin-right: 20rpx;
+    }
+  }
+
+  .iconfont.icon-right {
+    font-size: 24rpx;
+    color: #999;
   }
 }
 </style>

@@ -1,5 +1,7 @@
 {
-  "navigationBarTitleText": "列表",
+  "navigationBarTitleText": "帖子列表",
   "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "load-more": "/components/load-more/load-more"
+  }
 }

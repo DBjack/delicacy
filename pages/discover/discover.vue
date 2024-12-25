@@ -8,140 +8,212 @@
       </view>
     </view>
 
-    <!-- 轮播图 -->
-    <swiper class="banner" circular autoplay interval="3000" duration="500">
-      <swiper-item
-        v-for="(item, index) in banners"
-        :key="index"
-        @tap="handleBannerClick(item)"
-      >
-        <image :src="item.image" mode="aspectFill" />
-      </swiper-item>
-    </swiper>
+    <!-- 使用v-if控制整体内容的显示 -->
+    <template v-if="!isLoading">
+      <!-- 轮播图 -->
+      <swiper class="banner" circular autoplay interval="3000" duration="500">
+        <swiper-item
+          v-for="(item, index) in banners"
+          :key="index"
+          @tap="handleBannerClick(item)"
+        >
+          <image :src="item.image" mode="aspectFill" />
+        </swiper-item>
+      </swiper>
 
-    <!-- 功能导航 -->
-    <view class="nav-grid">
-      <view
-        class="nav-item"
-        v-for="(item, index) in navItems"
-        :key="index"
-        @tap="handleNavClick(item)"
-      >
-        <image :src="item.icon" mode="aspectFit" />
-        <text>{{ item.name }}</text>
+      <!-- 功能导航 -->
+      <view class="nav-grid">
+        <view
+          class="nav-item"
+          v-for="(item, index) in navItems"
+          :key="index"
+          @tap="handleNavClick(item)"
+        >
+          <image :src="item.icon" mode="aspectFit" />
+          <text>{{ item.name }}</text>
+        </view>
       </view>
-    </view>
 
-    <!-- 热门标签 -->
-    <view class="section">
-      <view class="section-header">
-        <text class="title">热门标签</text>
-        <text class="more" @tap="goToAllTags">查看全部</text>
+      <!-- 热门标签 -->
+      <view class="section" v-if="hotTags.length">
+        <view class="section-header">
+          <text class="title">热门标签</text>
+          <text class="more" @tap="goToAllTags">查看全部</text>
+        </view>
+        <scroll-view class="tags-scroll" scroll-x>
+          <view class="tags-list">
+            <view
+              class="tag-item"
+              v-for="tag in hotTags"
+              :key="tag.id"
+              @tap="handleTagClick(tag)"
+            >
+              <image
+                class="tag-bg"
+                :src="tag.image || defaultTagImage"
+                mode="aspectFill"
+              />
+              <view class="tag-content">
+                <text class="tag-name">#{{ tag.name }}</text>
+                <text class="tag-count">{{ tag.count }}篇</text>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
       </view>
-      <scroll-view class="tags-scroll" scroll-x>
-        <view class="tags-list">
+
+      <!-- 热门推荐 -->
+      <view class="section" v-if="hotPosts.length">
+        <view class="section-header">
+          <text class="title">热门推荐</text>
+          <text class="more" @tap="goToAllHot">更多精彩</text>
+        </view>
+        <view class="post-list">
           <view
-            class="tag-item"
-            v-for="tag in hotTags"
-            :key="tag.id"
-            @tap="handleTagClick(tag)"
+            class="post-item"
+            v-for="post in hotPosts"
+            :key="post._id"
+            @tap="goToDetail(post._id)"
           >
             <image
-              class="tag-bg"
-              :src="tag.image || defaultTagImage"
+              class="cover"
+              :src="post.images[0] || defaultImage"
               mode="aspectFill"
             />
-            <view class="tag-content">
-              <text class="tag-name">#{{ tag.name }}</text>
-              <text class="tag-count">{{ tag.count }}篇</text>
+            <view class="info">
+              <text class="title">{{ post.title }}</text>
+              <text class="description">{{ post.description }}</text>
+              <view class="meta">
+                <view class="author">
+                  <image
+                    class="avatar"
+                    :src="post.author.avatar || defaultAvatar"
+                    mode="aspectFill"
+                  />
+                  <text class="nickname">{{
+                    post.author.nickname || "美食家"
+                  }}</text>
+                </view>
+                <view class="stats">
+                  <view class="stat">
+                    <text class="iconfont icon-eye"></text>
+                    {{ formatNumber(post.viewCount) }}
+                  </view>
+                  <view class="stat">
+                    <text class="iconfont icon-heart"></text>
+                    {{ formatNumber(post.likeCount) }}
+                  </view>
+                </view>
+              </view>
             </view>
           </view>
         </view>
-      </scroll-view>
-    </view>
+      </view>
+    </template>
 
-    <!-- 热门推荐 -->
-    <view class="section">
-      <view class="section-header">
-        <text class="title">热门推荐</text>
-        <text class="more" @tap="goToAllHot">更多精彩</text>
-      </view>
-      <view class="post-list">
-        <view
-          class="post-item"
-          v-for="post in hotPosts"
-          :key="post._id"
-          @tap="goToDetail(post._id)"
-        >
-          <image
-            class="cover"
-            :src="post.images[0] || defaultImage"
-            mode="aspectFill"
-          />
-          <view class="info">
-            <text class="title">{{ post.title }}</text>
-            <text class="description">{{ post.description }}</text>
-            <view class="meta">
-              <view class="author">
-                <image
-                  class="avatar"
-                  :src="post.author.avatar || defaultAvatar"
-                  mode="aspectFill"
-                />
-                <text class="nickname">{{
-                  post.author.nickname || "美食家"
-                }}</text>
-              </view>
-              <view class="stats">
-                <text class="stat">{{ formatNumber(post.likeCount) }} 赞</text>
-                <text class="stat"
-                  >{{ formatNumber(post.collectCount) }} 收藏</text
-                >
+    <!-- 骨架屏 -->
+    <template v-else>
+      <view class="skeleton">
+        <!-- 轮播图骨架 -->
+        <view class="skeleton-banner"></view>
+
+        <!-- 导航骨架 -->
+        <view class="skeleton-nav">
+          <view class="skeleton-nav-item" v-for="i in 4" :key="i">
+            <view class="skeleton-icon"></view>
+            <view class="skeleton-text"></view>
+          </view>
+        </view>
+
+        <!-- 标签骨架 -->
+        <view class="skeleton-section">
+          <view class="skeleton-header">
+            <view class="skeleton-title"></view>
+          </view>
+          <view class="skeleton-tags">
+            <view class="skeleton-tag" v-for="i in 3" :key="i"></view>
+          </view>
+        </view>
+
+        <!-- 帖子骨架 -->
+        <view class="skeleton-section">
+          <view class="skeleton-header">
+            <view class="skeleton-title"></view>
+          </view>
+          <view class="skeleton-posts">
+            <view class="skeleton-post" v-for="i in 2" :key="i">
+              <view class="skeleton-cover"></view>
+              <view class="skeleton-info">
+                <view class="skeleton-post-title"></view>
+                <view class="skeleton-post-desc"></view>
+                <view class="skeleton-post-meta"></view>
               </view>
             </view>
           </view>
         </view>
       </view>
-    </view>
+    </template>
 
     <!-- 加载更多 -->
-    <uni-load-more :status="loadMoreStatus"></uni-load-more>
+    <load-more :status="loadMoreStatus" v-if="hotPosts.length"></load-more>
   </view>
 </template>
 
 <script>
+import LoadMore from "@/components/load-more/load-more.vue";
+
 export default {
+  components: {
+    LoadMore,
+  },
   data() {
     return {
+      isLoading: true,
       banners: [
-        { image: "/static/images/banner/banner1.jpg", url: "" },
-        { image: "/static/images/banner/banner2.jpg", url: "" },
-        { image: "/static/images/banner/banner3.jpg", url: "" },
+        { image: "https://img.icons8.com/color/512/food-blog.png", url: "" },
+        { image: "https://img.icons8.com/color/512/restaurant.png", url: "" },
+        { image: "https://img.icons8.com/color/512/dining-room.png", url: "" },
       ],
       navItems: [
         {
           name: "每日推荐",
-          icon: "/static/images/nav/recommend.png",
+          icon: "https://img.icons8.com/fluency/96/like.png",
           type: "recommend",
         },
-        { name: "排行榜", icon: "/static/images/nav/rank.png", type: "rank" },
-        { name: "食谱", icon: "/static/images/nav/recipe.png", type: "recipe" },
-        { name: "达人", icon: "/static/images/nav/expert.png", type: "expert" },
+        {
+          name: "排行榜",
+          icon: "https://img.icons8.com/fluency/96/trophy.png",
+          type: "rank",
+        },
+        {
+          name: "食谱",
+          icon: "https://img.icons8.com/fluency/96/cookbook.png",
+          type: "recipe",
+        },
+        {
+          name: "达人",
+          icon: "https://img.icons8.com/fluency/96/chef-hat.png",
+          type: "expert",
+        },
       ],
       hotTags: [],
       hotPosts: [],
       page: 1,
       pageSize: 10,
       loadMoreStatus: "more",
-      isLoading: false,
-      defaultImage: "/static/images/default-food.jpg",
-      defaultAvatar: "/static/images/default-avatar.png",
-      defaultTagImage: "/static/images/default-tag.jpg",
+      defaultImage: "https://img.icons8.com/color/512/food.png",
+      defaultAvatar: "https://img.icons8.com/color/512/user.png",
+      defaultTagImage: "https://img.icons8.com/color/512/tag.png",
     };
   },
 
-  onLoad() {
-    this.loadData();
+  async onLoad() {
+    try {
+      this.isLoading = true;
+      await this.loadData();
+    } finally {
+      this.isLoading = false;
+    }
   },
 
   onPullDownRefresh() {
@@ -154,38 +226,74 @@ export default {
 
   methods: {
     async loadData() {
-      await Promise.all([this.loadHotTags(), this.loadHotPosts()]);
+      try {
+        console.log("开始加载数据...");
+        const [tagsRes, postsRes] = await Promise.all([
+          this.loadHotTags(),
+          this.loadHotPosts(),
+        ]);
+        console.log("数据加载完成:", { tagsRes, postsRes });
+      } catch (error) {
+        console.error("数据加载失败:", error);
+      }
     },
 
     async loadHotTags() {
       try {
+        console.log("开始加载热门标签...");
         const res = await uniCloud.callFunction({
           name: "discover",
           data: {
             action: "getHotTags",
-            params: {},
           },
         });
 
-        if (res.result.code === 0) {
-          this.hotTags = res.result.data;
+        console.log("热门标签返回结果:", res);
+
+        if (res.result && res.result.code === 0) {
+          this.hotTags = res.result.data || [];
+          return res.result;
         } else {
-          throw new Error(res.result.msg);
+          throw new Error(res.result?.msg || "获取热门标签失败");
         }
       } catch (error) {
         console.error("获取热门标签失败:", error);
-        uni.showToast({
-          title: "获取热门标签失败",
-          icon: "none",
-        });
+        // 使用一些默认标签数据
+        this.hotTags = [
+          {
+            id: 1,
+            name: "家常菜",
+            count: 128,
+            image: "https://img.icons8.com/color/512/chinese-food.png",
+          },
+          {
+            id: 2,
+            name: "甜点",
+            count: 96,
+            image: "https://img.icons8.com/color/512/cake.png",
+          },
+          {
+            id: 3,
+            name: "烘焙",
+            count: 85,
+            image: "https://img.icons8.com/color/512/bread.png",
+          },
+          {
+            id: 4,
+            name: "早餐",
+            count: 76,
+            image: "https://img.icons8.com/color/512/breakfast.png",
+          },
+        ];
+        return { code: 1, msg: error.message };
       }
     },
 
     async loadHotPosts() {
       if (this.isLoading) return;
-      this.isLoading = true;
 
       try {
+        console.log("开始加载热门帖子...");
         const res = await uniCloud.callFunction({
           name: "discover",
           data: {
@@ -197,8 +305,10 @@ export default {
           },
         });
 
-        if (res.result.code === 0) {
-          const posts = res.result.data;
+        console.log("热门帖子返回结果:", res);
+
+        if (res.result && res.result.code === 0) {
+          const posts = res.result.data || [];
           if (this.page === 1) {
             this.hotPosts = posts;
           } else {
@@ -206,15 +316,30 @@ export default {
           }
           this.loadMoreStatus =
             posts.length < this.pageSize ? "noMore" : "more";
+          return res.result;
         } else {
-          throw new Error(res.result.msg);
+          throw new Error(res.result?.msg || "获取热门帖子失败");
         }
       } catch (error) {
         console.error("获取热门帖子失败:", error);
-        uni.showToast({
-          title: "获取热门帖子失败",
-          icon: "none",
-        });
+        // 使用一些默认帖子数据
+        if (this.page === 1) {
+          this.hotPosts = [
+            {
+              _id: "1",
+              title: "美味家常菜",
+              description: "简单易做的家常菜谱",
+              images: ["https://img.icons8.com/color/512/chinese-food.png"],
+              author: {
+                nickname: "美食家",
+                avatar: "https://img.icons8.com/color/512/user.png",
+              },
+              viewCount: 1000,
+              likeCount: 500,
+            },
+          ];
+        }
+        return { code: 1, msg: error.message };
       } finally {
         this.isLoading = false;
         uni.stopPullDownRefresh();
@@ -308,6 +433,7 @@ export default {
   min-height: 100vh;
   background: #f8f8f8;
   padding-bottom: 30rpx;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .search-box {
@@ -371,7 +497,9 @@ export default {
 }
 
 .nav-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
   background: #fff;
   padding: 30rpx 20rpx;
   margin: 0 20rpx 30rpx;
@@ -379,10 +507,10 @@ export default {
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
 
   .nav-item {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     transition: transform 0.2s ease;
 
     &:active {
@@ -390,18 +518,13 @@ export default {
     }
 
     image {
-      width: 90rpx;
-      height: 90rpx;
-      margin-bottom: 16rpx;
-      transition: transform 0.3s ease;
-
-      &:hover {
-        transform: translateY(-2rpx);
-      }
+      width: 80rpx;
+      height: 80rpx;
+      margin-bottom: 12rpx;
     }
 
     text {
-      font-size: 26rpx;
+      font-size: 24rpx;
       color: #333;
       font-weight: 500;
     }
@@ -622,19 +745,158 @@ export default {
               margin-left: 0;
             }
 
-            &::before {
-              content: "•";
-              margin-right: 24rpx;
-              color: #ddd;
-            }
-
-            &:first-child::before {
-              display: none;
+            .iconfont {
+              font-size: 24rpx;
+              margin-right: 6rpx;
             }
           }
         }
       }
     }
+  }
+}
+
+.stat {
+  .iconfont {
+    font-size: 24rpx;
+    margin-right: 6rpx;
+  }
+}
+
+.skeleton {
+  padding: 20rpx;
+
+  &-banner {
+    height: 320rpx;
+    background: #f0f0f0;
+    border-radius: 16rpx;
+    margin-bottom: 30rpx;
+  }
+
+  &-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 30rpx;
+    background: #fff;
+    border-radius: 16rpx;
+    margin-bottom: 30rpx;
+  }
+
+  &-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .skeleton-icon {
+      width: 90rpx;
+      height: 90rpx;
+      background: #f0f0f0;
+      border-radius: 50%;
+      margin-bottom: 16rpx;
+    }
+
+    .skeleton-text {
+      width: 60rpx;
+      height: 28rpx;
+      background: #f0f0f0;
+      border-radius: 4rpx;
+    }
+  }
+
+  &-section {
+    background: #fff;
+    border-radius: 16rpx;
+    padding: 30rpx;
+    margin-bottom: 30rpx;
+  }
+
+  &-header {
+    margin-bottom: 24rpx;
+    .skeleton-title {
+      width: 200rpx;
+      height: 40rpx;
+      background: #f0f0f0;
+      border-radius: 4rpx;
+    }
+  }
+
+  &-tags {
+    display: flex;
+    overflow-x: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &-tag {
+    flex-shrink: 0;
+    width: 260rpx;
+    height: 140rpx;
+    background: #f0f0f0;
+    border-radius: 16rpx;
+    margin-right: 24rpx;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &-posts {
+    .skeleton-post {
+      display: flex;
+      margin-bottom: 30rpx;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .skeleton-cover {
+      width: 200rpx;
+      height: 150rpx;
+      background: #f0f0f0;
+      border-radius: 8rpx;
+      margin-right: 20rpx;
+    }
+
+    .skeleton-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .skeleton-post-title {
+      width: 80%;
+      height: 32rpx;
+      background: #f0f0f0;
+      border-radius: 4rpx;
+      margin-bottom: 16rpx;
+    }
+
+    .skeleton-post-desc {
+      width: 90%;
+      height: 24rpx;
+      background: #f0f0f0;
+      border-radius: 4rpx;
+      margin-bottom: 16rpx;
+    }
+
+    .skeleton-post-meta {
+      width: 60%;
+      height: 24rpx;
+      background: #f0f0f0;
+      border-radius: 4rpx;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>

@@ -1,26 +1,32 @@
 <template>
   <view class="container">
     <view class="search-box">
-      <view class="search-bar">
-        <view class="iconfont icon-search"></view>
-        <input
-          class="search-input"
-          type="text"
-          v-model="keyword"
-          placeholder="搜索美食、食谱、达人"
-          confirm-type="search"
-          @confirm="handleSearch"
-          @input="handleInput"
-        />
-        <view class="clear-btn" v-if="keyword" @tap="clearKeyword">×</view>
-      </view>
-      <view class="cancel-btn" @tap="goBack">取消</view>
+      <text class="iconfont icon-search"></text>
+      <input
+        class="search-input"
+        type="text"
+        v-model="keyword"
+        placeholder="搜索美食、食谱、达人"
+        confirm-type="search"
+        @confirm="handleSearch"
+      />
+      <text
+        v-if="keyword"
+        class="iconfont icon-close"
+        @click="clearKeyword"
+      ></text>
     </view>
 
-    <view class="history-section" v-if="!keyword && searchHistory.length">
-      <view class="section-header">
-        <text class="title">搜索历史</text>
-        <view class="clear-all" @tap="clearHistory">清空</view>
+    <view class="history" v-if="!keyword && searchHistory.length">
+      <view class="header">
+        <text class="title">
+          <text class="iconfont icon-clock"></text>
+          搜索历史
+        </text>
+        <text class="clear" @tap="clearHistory">
+          <text class="iconfont icon-delete"></text>
+          清除
+        </text>
       </view>
       <view class="history-list">
         <view
@@ -29,9 +35,11 @@
           :key="index"
           @tap="useHistoryKeyword(item)"
         >
-          <view class="iconfont icon-time"></view>
+          <text class="iconfont icon-clock"></text>
           <view class="keyword">{{ item }}</view>
-          <view class="delete-btn" @tap.stop="deleteHistory(index)">×</view>
+          <view class="delete-btn" @tap.stop="deleteHistory(index)">
+            <text class="iconfont icon-close"></text>
+          </view>
         </view>
       </view>
     </view>
@@ -101,18 +109,20 @@
         <text class="empty-text">暂无相关内容</text>
       </view>
 
-      <uni-load-more
-        v-if="searchResults.length"
-        :status="loadMoreStatus"
-      ></uni-load-more>
+      <load-more :status="loadMoreStatus"></load-more>
     </scroll-view>
   </view>
 </template>
 
 <script>
+import LoadMore from "@/components/load-more/load-more.vue";
+
 const MAX_HISTORY = 10;
 
 export default {
+  components: {
+    LoadMore,
+  },
   data() {
     return {
       keyword: "",
@@ -291,8 +301,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/iconfont.scss";
-
 .container {
   min-height: 100vh;
   background: #f8f8f8;
@@ -307,43 +315,20 @@ export default {
   top: 0;
   z-index: 100;
 
-  .search-bar {
+  .search-input {
     flex: 1;
-    height: 72rpx;
-    background: #f5f5f5;
-    border-radius: 36rpx;
-    display: flex;
-    align-items: center;
-    padding: 0 24rpx;
-    margin-right: 20rpx;
-
-    .icon-search {
-      font-size: 32rpx;
-      color: #999;
-      margin-right: 12rpx;
-    }
-
-    .search-input {
-      flex: 1;
-      height: 100%;
-      font-size: 28rpx;
-    }
-
-    .clear-btn {
-      width: 48rpx;
-      height: 48rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #999;
-      font-size: 36rpx;
-    }
+    height: 100%;
+    font-size: 28rpx;
   }
 
-  .cancel-btn {
-    font-size: 28rpx;
-    color: #666;
-    padding: 20rpx 0;
+  .icon-clear {
+    width: 48rpx;
+    height: 48rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 36rpx;
   }
 }
 
@@ -516,6 +501,24 @@ export default {
   .empty-text {
     font-size: 28rpx;
     color: #999;
+  }
+}
+
+.history {
+  .header {
+    .title {
+      .iconfont {
+        font-size: 28rpx;
+        margin-right: 8rpx;
+      }
+    }
+
+    .clear {
+      .iconfont {
+        font-size: 28rpx;
+        margin-right: 8rpx;
+      }
+    }
   }
 }
 </style>

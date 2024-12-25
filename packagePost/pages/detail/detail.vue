@@ -1,78 +1,99 @@
 <template>
   <view class="container">
-    <view class="post-content" v-if="post._id">
-      <view class="author">
-        <image
-          class="avatar"
-          :src="post.author?.avatar || '/static/images/default-avatar.png'"
-          mode="aspectFill"
-          @tap="goToUser(post.author?._id)"
-        />
-        <view class="info">
-          <text class="nickname">{{ post.author?.nickname || "美食家" }}</text>
-          <text class="time">{{ formatTime(post.create_date) }}</text>
+    <block v-if="post._id">
+      <view class="post-content">
+        <view class="author">
+          <image
+            class="avatar"
+            :src="
+              (post.author && post.author.avatar) ||
+              '/static/images/default-avatar.png'
+            "
+            mode="aspectFill"
+            @tap="goToUser(post.author && post.author._id)"
+          />
+          <view class="info">
+            <text class="nickname">{{
+              (post.author && post.author.nickname) || "美食家"
+            }}</text>
+            <text class="time">{{ formatTime(post.create_date) }}</text>
+          </view>
+          <block v-if="post.author && post.author._id !== currentUser._id">
+            <button
+              class="follow-btn"
+              :class="{ following: isFollowing }"
+              @tap="handleFollow"
+            >
+              {{ isFollowing ? "已关注" : "关注" }}
+            </button>
+          </block>
         </view>
-        <button
-          v-if="post.author && post.author._id !== currentUser._id"
-          class="follow-btn"
-          :class="{ following: isFollowing }"
-          @tap="handleFollow"
-        >
-          {{ isFollowing ? "已关注" : "关注" }}
-        </button>
-      </view>
 
-      <text class="title">{{ post.title }}</text>
-      <text class="description">{{ post.description }}</text>
+        <text class="title">{{ post.title }}</text>
+        <text class="description">{{ post.description }}</text>
 
-      <view class="images" v-if="post.images?.length">
-        <image
-          v-for="(image, index) in post.images"
-          :key="index"
-          :src="image"
-          mode="widthFix"
-          @tap="previewImage(index)"
-        />
-      </view>
+        <block v-if="post.images && post.images.length">
+          <view class="images">
+            <image
+              v-for="(image, index) in post.images"
+              :key="index"
+              :src="image"
+              mode="widthFix"
+              @tap="previewImage(index)"
+            />
+          </view>
+        </block>
 
-      <view class="tags" v-if="post.tags?.length">
-        <text
-          v-for="tag in post.tags"
-          :key="tag"
-          class="tag"
-          @tap="goToTagPosts(tag)"
-        >
-          #{{ tag }}
-        </text>
-      </view>
+        <block v-if="post.tags && post.tags.length">
+          <view class="tags">
+            <text
+              v-for="tag in post.tags"
+              :key="tag"
+              class="tag"
+              @tap="goToTagPosts(tag)"
+            >
+              #{{ tag }}
+            </text>
+          </view>
+        </block>
 
-      <view class="location" v-if="post.location">
-        <text class="iconfont icon-location"></text>
-        <text>{{ post.location }}</text>
+        <block v-if="post.location">
+          <view class="location">
+            <text class="iconfont icon-location"></text>
+            <text>{{ post.location }}</text>
+          </view>
+        </block>
       </view>
-    </view>
+    </block>
 
     <view class="comments">
       <view class="section-title">评论 {{ post.commentCount || 0 }}</view>
       <view class="comment-list">
-        <view
-          v-for="comment in comments"
-          :key="comment._id"
-          class="comment-item"
-        >
-          <image
-            class="avatar"
-            :src="comment.user?.avatar || '/static/images/default-avatar.png'"
-            mode="aspectFill"
-          />
-          <view class="content">
-            <text class="nickname">{{ comment.user?.nickname }}</text>
-            <text class="text">{{ comment.content }}</text>
-            <text class="time">{{ formatTime(comment.create_date) }}</text>
+        <block v-if="comments.length">
+          <view
+            v-for="comment in comments"
+            :key="comment._id"
+            class="comment-item"
+          >
+            <image
+              class="avatar"
+              :src="
+                (comment.user && comment.user.avatar) ||
+                '/static/images/default-avatar.png'
+              "
+              mode="aspectFill"
+            />
+            <view class="content">
+              <text class="nickname">{{
+                comment.user && comment.user.nickname
+              }}</text>
+              <text class="text">{{ comment.content }}</text>
+              <text class="time">{{ formatTime(comment.create_date) }}</text>
+            </view>
           </view>
-        </view>
+        </block>
+        <view v-else class="empty">暂无评论</view>
       </view>
-      <view class="empty" v-if="!comments.length">暂无评论</view>
     </view>
 
     <view class="action-bar">
@@ -88,7 +109,8 @@
         <view class="action-item" @tap="handleLike">
           <text
             class="iconfont"
-            :class="isLiked ? 'icon-like-fill' : 'icon-like'"
+            :class="isLiked ? 'icon-heart-fill' : 'icon-heart'"
+            :style="{ color: isLiked ? '#ff6b6b' : '#999' }"
           ></text>
           <text class="count">{{ post.likeCount || 0 }}</text>
         </view>
@@ -96,6 +118,7 @@
           <text
             class="iconfont"
             :class="isCollected ? 'icon-star-fill' : 'icon-star'"
+            :style="{ color: isCollected ? '#ff6b6b' : '#999' }"
           ></text>
           <text class="count">{{ post.collectCount || 0 }}</text>
         </view>
@@ -109,7 +132,12 @@
 </template>
 
 <script>
+import LoadMore from "@/components/load-more/load-more.vue";
+
 export default {
+  components: {
+    LoadMore,
+  },
   data() {
     return {
       postId: "",
@@ -156,11 +184,15 @@ export default {
 
     async loadData() {
       try {
-        await Promise.all([
-          this.loadPostDetail(),
-          this.loadComments(),
-          this.checkInteractionStatus(),
-        ]);
+        console.log("开始加载数据...");
+        await this.loadPostDetail();
+
+        if (this.post._id) {
+          await Promise.all([
+            this.loadComments(),
+            this.checkInteractionStatus(),
+          ]);
+        }
       } catch (error) {
         console.error("加载数据失败:", error);
         uni.showToast({
@@ -171,38 +203,61 @@ export default {
     },
 
     async loadPostDetail() {
-      const res = await uniCloud.callFunction({
-        name: "post",
-        data: {
-          action: "getPostDetail",
-          params: {
-            postId: this.postId,
-          },
-        },
-      });
+      try {
+        console.log("正在加载帖子详情，ID:", this.postId);
 
-      if (res.result.code === 0) {
-        this.post = res.result.data;
-      } else {
-        throw new Error(res.result.msg);
+        const res = await uniCloud.callFunction({
+          name: "posts",
+          data: {
+            action: "getPostDetail",
+            params: {
+              postId: this.postId,
+            },
+          },
+        });
+
+        console.log("帖子详情返回结果:", res);
+
+        if (res.result.code === 0 && res.result.data) {
+          this.post = res.result.data;
+          console.log("设置的帖子数据:", this.post);
+        } else {
+          throw new Error(res.result.msg || "获取帖子详情失败");
+        }
+      } catch (error) {
+        console.error("获取帖子详情失败:", error);
+        uni.showToast({
+          title: error.message || "获取帖子详情失败",
+          icon: "none",
+        });
       }
     },
 
     async loadComments() {
-      const res = await uniCloud.callFunction({
-        name: "comment",
-        data: {
-          action: "getList",
-          params: {
-            postId: this.postId,
+      try {
+        const res = await uniCloud.callFunction({
+          name: "comment",
+          data: {
+            action: "getList",
+            params: {
+              postId: this.postId,
+              page: 1,
+              pageSize: 20,
+            },
           },
-        },
-      });
+        });
 
-      if (res.result.code === 0) {
-        this.comments = res.result.data;
-      } else {
-        throw new Error(res.result.msg);
+        if (res.result.code === 0) {
+          this.comments = res.result.data || [];
+        } else {
+          throw new Error(res.result.msg || "获取评论失败");
+        }
+      } catch (error) {
+        console.error("获取评论失败:", error);
+        uni.showToast({
+          title: error.message || "获取评论失败",
+          icon: "none",
+        });
       }
     },
 

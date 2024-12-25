@@ -1,0 +1,1 @@
+<view class="load-more"><block wx:if="{{status==='loading'}}"><view class="loading"><view class="loading-icon"></view><text class="loading-text">加载中...</text></view></block><block wx:if="{{status==='noMore'}}"><view class="no-more"><text class="no-more-line"></text><text class="no-more-text">没有更多了</text><text class="no-more-line"></text></view></block></view>

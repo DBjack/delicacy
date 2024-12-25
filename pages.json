@@ -3,13 +3,15 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页"
+				"navigationBarTitleText": "首页",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
 			"path": "pages/discover/discover",
 			"style": {
-				"navigationBarTitleText": "发现"
+				"navigationBarTitleText": "发现",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -21,30 +23,108 @@
 		{
 			"path": "pages/user/user",
 			"style": {
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/auth/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/search/index",
+			"style": {
+				"navigationBarTitleText": "搜索"
 			}
 		}
 	],
 	"subPackages": [
+		{
+			"root": "packageUser",
+			"pages": [
+				{
+					"path": "pages/edit-profile/edit-profile",
+					"style": {
+						"navigationBarTitleText": "编辑资料"
+					}
+				},
+				{
+					"path": "pages/settings/settings",
+					"style": {
+						"navigationBarTitleText": "设置"
+					}
+				},
+				{
+					"path": "pages/following/following",
+					"style": {
+						"navigationBarTitleText": "关注",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/followers/followers",
+					"style": {
+						"navigationBarTitleText": "粉丝",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/likes/likes",
+					"style": {
+						"navigationBarTitleText": "喜欢",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/collections/collections",
+					"style": {
+						"navigationBarTitleText": "收藏",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/drafts/drafts",
+					"style": {
+						"navigationBarTitleText": "草稿箱",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/posts/posts",
+					"style": {
+						"navigationBarTitleText": "我的帖子",
+						"enablePullDownRefresh": true
+					}
+				}
+			]
+		},
 		{
 			"root": "packagePost",
 			"pages": [
 				{
 					"path": "pages/detail/detail",
 					"style": {
-						"navigationBarTitleText": "详情"
+						"navigationBarTitleText": "帖子详情"
 					}
 				},
 				{
 					"path": "pages/list/list",
 					"style": {
-						"navigationBarTitleText": "列表",
+						"navigationBarTitleText": "帖子列表",
 						"enablePullDownRefresh": true
 					}
 				}
 			]
 		}
 	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "美食分享",
+		"navigationBarBackgroundColor": "#ffffff",
+		"backgroundColor": "#F8F8F8"
+	},
 	"tabBar": {
 		"color": "#999999",
 		"selectedColor": "#ff6b6b",
@@ -54,8 +134,8 @@
 			{
 				"pagePath": "pages/index/index",
 				"text": "首页",
-				"iconPath": "static/tabbar/index.png",
-				"selectedIconPath": "static/tabbar/index-active.png"
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png"
 			},
 			{
 				"pagePath": "pages/discover/discover",
@@ -76,11 +156,5 @@
 				"selectedIconPath": "static/tabbar/user-active.png"
 			}
 		]
-	},
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "美食天地",
-		"navigationBarBackgroundColor": "#ffffff",
-		"backgroundColor": "#f8f8f8"
 	}
 }

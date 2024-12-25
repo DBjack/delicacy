@@ -27,6 +27,8 @@
 .container {
   min-height: 100vh;
   background: #f8f8f8;
+  display: flex;
+  flex-direction: column;
 }
 .category-scroll {
   background: #fff;
@@ -36,6 +38,7 @@
   top: 0;
   z-index: 100;
   box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 .category-scroll .category-list {
   display: flex;
@@ -65,13 +68,16 @@
   font-weight: 500;
 }
 .content-scroll {
-  height: calc(100vh - 112rpx);
+  flex: 1;
+  height: 0;
   padding: 20rpx;
+  box-sizing: border-box;
 }
 .food-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20rpx;
+  padding-bottom: 120rpx;
 }
 .food-grid .food-item {
   background: #fff;
@@ -111,12 +117,14 @@
   display: flex;
   align-items: center;
   flex: 1;
+  min-width: 0;
 }
 .food-grid .food-item .food-info .food-meta .author .avatar {
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
   margin-right: 8rpx;
+  flex-shrink: 0;
 }
 .food-grid .food-item .food-info .food-meta .author .nickname {
   font-size: 24rpx;
@@ -125,6 +133,9 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 120rpx;
+}
+.food-grid .food-item .food-info .food-meta .stats {
+  flex-shrink: 0;
 }
 .food-grid .food-item .food-info .food-meta .stats .likes {
   font-size: 24rpx;

@@ -1,8 +1,6 @@
 @font-face {
   font-family: "iconfont";
-  src: url('//at.alicdn.com/t/font_3237405_q1z0xr5qr6.woff2?t=1647424459746') format('woff2'),
-       url('//at.alicdn.com/t/font_3237405_q1z0xr5qr6.woff?t=1647424459746') format('woff'),
-       url('//at.alicdn.com/t/font_3237405_q1z0xr5qr6.ttf?t=1647424459746') format('truetype');
+  src: url('/static/fonts/iconfont.ttf') format('truetype');
 }
 
 .iconfont {
@@ -13,46 +11,98 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-like:before {
+  content: "\e8ad";
+}
+
+.icon-like-fill:before {
+  content: "\e869";
+}
+
+.icon-comment:before {
+  content: "\e667";
+}
+
+.icon-collect:before {
+  content: "\e6ea";
+}
+
+.icon-collect-fill:before {
+  content: "\e6e9";
+}
+
+.icon-share:before {
+  content: "\e739";
+}
+
+.icon-location:before {
+  content: "\e651";
+}
+
+.icon-time:before {
+  content: "\e65f";
+}
+
+.icon-category:before {
+  content: "\e747";
+}
+
+.icon-edit:before {
+  content: "\e649";
+}
+
 .icon-delete:before {
-  content: "\e6b4";
-}
-
-.icon-camera:before {
-  content: "\e6ac";
-}
-
-.icon-draft:before {
-  content: "\e6b2";
-}
-
-.icon-home:before {
-  content: "\e6b8";
-}
-
-.icon-dessert:before {
-  content: "\e6ba";
-}
-
-.icon-baking:before {
-  content: "\e6bc";
-}
-
-.icon-drink:before {
-  content: "\e6be";
-}
-
-.icon-snack:before {
-  content: "\e6c0";
-}
-
-.icon-other:before {
-  content: "\e6c2";
+  content: "\e67e";
 }
 
 .icon-arrow-right:before {
-  content: "\e6b6";
+  content: "\e665";
 }
 
-.icon-save:before {
-  content: "\e6b0";
+.icon-arrow-left:before {
+  content: "\e664";
+}
+
+.icon-close:before {
+  content: "\e668";
+}
+
+.icon-add:before {
+  content: "\e664";
+}
+
+.icon-camera:before {
+  content: "\e872";
+}
+
+.icon-image:before {
+  content: "\e695";
+}
+
+.icon-wechat:before {
+  content: "\e8bb";
+}
+
+.icon-search:before {
+  content: "\e8ef";
+}
+
+.icon-settings:before {
+  content: "\e78e";
+}
+
+.icon-user:before {
+  content: "\e7ae";
+}
+
+.icon-home:before {
+  content: "\e7c6";
+}
+
+.icon-discover:before {
+  content: "\e67a";
+}
+
+.icon-publish:before {
+  content: "\e6eb";
 } 

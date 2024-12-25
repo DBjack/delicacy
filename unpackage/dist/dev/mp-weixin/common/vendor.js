@@ -776,7 +776,7 @@ function populateParameters(result) {
 
   var parameters = {
     appId: "__UNI__290B85C",
-    appName: "delicacy",
+    appName: "美食分享",
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
@@ -875,7 +875,7 @@ var getAppBaseInfo = {
     var hostLanguage = language.replace('_', '-');
     result = sortObject(Object.assign(result, {
       appId: "__UNI__290B85C",
-      appName: "delicacy",
+      appName: "美食分享",
       appVersion: "1.0.0",
       appVersionCode: "100",
       appLanguage: getAppLanguage(hostLanguage),
@@ -1557,7 +1557,7 @@ function initData(vueOptions, context) {
     try {
       data = data.call(context); // 支持 Vue.prototype 上挂的数据
     } catch (e) {
-      if (Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"delicacy","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"美食分享","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.warn('根据 Vue 的 data 函数初始化小程序 data 失败，请尽量确保 data 函数中不访问 vm 对象，否则可能影响首次数据渲染速度。', data);
       }
     }
@@ -8923,7 +8923,7 @@ function type(obj) {
 
 function flushCallbacks$1(vm) {
     if (vm.__next_tick_callbacks && vm.__next_tick_callbacks.length) {
-        if (Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"delicacy","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+        if (Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"美食分享","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:flushCallbacks[' + vm.__next_tick_callbacks.length + ']');
@@ -8944,14 +8944,14 @@ function nextTick$1(vm, cb) {
     //1.nextTick 之前 已 setData 且 setData 还未回调完成
     //2.nextTick 之前存在 render watcher
     if (!vm.__next_tick_pending && !hasRenderWatcher(vm)) {
-        if(Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"delicacy","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"美食分享","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:nextVueTick');
         }
         return nextTick(cb, vm)
     }else{
-        if(Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"delicacy","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"美食分享","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance$1 = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance$1.is || mpInstance$1.route) + '][' + vm._uid +
                 ']:nextMPTick');
@@ -9047,7 +9047,7 @@ var patch = function(oldVnode, vnode) {
     });
     var diffData = this.$shouldDiffData === false ? data : diff(data, mpData);
     if (Object.keys(diffData).length) {
-      if (Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"delicacy","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_DARK_MODE":"false","VUE_APP_NAME":"美食分享","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + this._uid +
           ']差量更新',
           JSON.stringify(diffData));
@@ -9951,7 +9951,7 @@ var S = "development" === "development",
   k = "true" === undefined || !0 === undefined,
   A = I([]),
   C = "h5" === b ? "web" : "app-plus" === b ? "app" : b,
-  P = I({"address":["127.0.0.1","172.23.192.1","172.21.224.1","172.22.112.1","192.168.11.109"],"servePort":7001,"debugPort":9001,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/software/HBuilderX/plugins/unicloud/**/*.js"]}),
+  P = I({"address":["127.0.0.1","172.23.192.1","172.21.224.1","172.22.112.1","192.168.11.109"],"servePort":7000,"debugPort":9000,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/software/HBuilderX/plugins/unicloud/**/*.js"]}),
   T = I([{"provider":"aliyun","spaceName":"delicacy-cloud","spaceId":"mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e","clientSecret":"s8DmEaWFnpPY+4X3a2wlyA==","endpoint":"https://api.next.bspapp.com"}]) || [],
   x = true;
 var O = "";
@@ -17911,12 +17911,14 @@ var _default = {
   "pages": [{
     "path": "pages/index/index",
     "style": {
-      "navigationBarTitleText": "首页"
+      "navigationBarTitleText": "首页",
+      "enablePullDownRefresh": true
     }
   }, {
     "path": "pages/discover/discover",
     "style": {
-      "navigationBarTitleText": "发现"
+      "navigationBarTitleText": "发现",
+      "enablePullDownRefresh": true
     }
   }, {
     "path": "pages/publish/publish",
@@ -17926,24 +17928,90 @@ var _default = {
   }, {
     "path": "pages/user/user",
     "style": {
-      "navigationBarTitleText": "我的"
+      "navigationBarTitleText": "我的",
+      "enablePullDownRefresh": true
+    }
+  }, {
+    "path": "pages/auth/login",
+    "style": {
+      "navigationBarTitleText": "登录"
+    }
+  }, {
+    "path": "pages/search/index",
+    "style": {
+      "navigationBarTitleText": "搜索"
     }
   }],
   "subPackages": [{
+    "root": "packageUser",
+    "pages": [{
+      "path": "pages/edit-profile/edit-profile",
+      "style": {
+        "navigationBarTitleText": "编辑资料"
+      }
+    }, {
+      "path": "pages/settings/settings",
+      "style": {
+        "navigationBarTitleText": "设置"
+      }
+    }, {
+      "path": "pages/following/following",
+      "style": {
+        "navigationBarTitleText": "关注",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/followers/followers",
+      "style": {
+        "navigationBarTitleText": "粉丝",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/likes/likes",
+      "style": {
+        "navigationBarTitleText": "喜欢",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/collections/collections",
+      "style": {
+        "navigationBarTitleText": "收藏",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/drafts/drafts",
+      "style": {
+        "navigationBarTitleText": "草稿箱",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/posts/posts",
+      "style": {
+        "navigationBarTitleText": "我的帖子",
+        "enablePullDownRefresh": true
+      }
+    }]
+  }, {
     "root": "packagePost",
     "pages": [{
       "path": "pages/detail/detail",
       "style": {
-        "navigationBarTitleText": "详情"
+        "navigationBarTitleText": "帖子详情"
       }
     }, {
       "path": "pages/list/list",
       "style": {
-        "navigationBarTitleText": "列表",
+        "navigationBarTitleText": "帖子列表",
         "enablePullDownRefresh": true
       }
     }]
   }],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "美食分享",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#F8F8F8"
+  },
   "tabBar": {
     "color": "#999999",
     "selectedColor": "#ff6b6b",
@@ -17952,8 +18020,8 @@ var _default = {
     "list": [{
       "pagePath": "pages/index/index",
       "text": "首页",
-      "iconPath": "static/tabbar/index.png",
-      "selectedIconPath": "static/tabbar/index-active.png"
+      "iconPath": "static/tabbar/home.png",
+      "selectedIconPath": "static/tabbar/home-active.png"
     }, {
       "pagePath": "pages/discover/discover",
       "text": "发现",
@@ -17970,12 +18038,6 @@ var _default = {
       "iconPath": "static/tabbar/user.png",
       "selectedIconPath": "static/tabbar/user-active.png"
     }]
-  },
-  "globalStyle": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "美食天地",
-    "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#f8f8f8"
   }
 };
 exports.default = _default;
@@ -18135,30 +18197,6 @@ function normalizeComponent (
   }
 }
 
-
-/***/ }),
-/* 45 */
-/*!********************************************************************!*\
-  !*** D:/code/weChat/miniprogram/delicacy/uni.promisify.adaptor.js ***!
-  \********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(uni) {var _typeof = __webpack_require__(/*! @babel/runtime/helpers/typeof */ 13);
-uni.addInterceptor({
-  returnValue: function returnValue(res) {
-    if (!(!!res && (_typeof(res) === "object" || typeof res === "function") && typeof res.then === "function")) {
-      return res;
-    }
-    return new Promise(function (resolve, reject) {
-      res.then(function (res) {
-        if (!res) return resolve(res);
-        return res[0] ? reject(res[0]) : resolve(res[1]);
-      });
-    });
-  }
-});
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 2)["default"]))
 
 /***/ })
 ]]);

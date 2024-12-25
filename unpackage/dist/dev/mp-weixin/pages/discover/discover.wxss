@@ -28,6 +28,8 @@
   min-height: 100vh;
   background: #f8f8f8;
   padding-bottom: 30rpx;
+  -webkit-animation: fadeIn 0.3s ease-in-out;
+          animation: fadeIn 0.3s ease-in-out;
 }
 .search-box {
   position: -webkit-sticky;
@@ -91,7 +93,9 @@
           transform: scale(1.05);
 }
 .nav-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
   background: #fff;
   padding: 30rpx 20rpx;
   margin: 0 20rpx 30rpx;
@@ -99,10 +103,10 @@
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
 }
 .nav-grid .nav-item {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   transition: -webkit-transform 0.2s ease;
   transition: transform 0.2s ease;
   transition: transform 0.2s ease, -webkit-transform 0.2s ease;
@@ -112,19 +116,12 @@
           transform: scale(0.95);
 }
 .nav-grid .nav-item image {
-  width: 90rpx;
-  height: 90rpx;
-  margin-bottom: 16rpx;
-  transition: -webkit-transform 0.3s ease;
-  transition: transform 0.3s ease;
-  transition: transform 0.3s ease, -webkit-transform 0.3s ease;
-}
-.nav-grid .nav-item image:hover {
-  -webkit-transform: translateY(-2rpx);
-          transform: translateY(-2rpx);
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 12rpx;
 }
 .nav-grid .nav-item text {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #333;
   font-weight: 500;
 }
@@ -328,12 +325,136 @@
 .post-list .post-item .info .meta .stats .stat:first-child {
   margin-left: 0;
 }
-.post-list .post-item .info .meta .stats .stat::before {
-  content: "•";
-  margin-right: 24rpx;
-  color: #ddd;
+.post-list .post-item .info .meta .stats .stat .iconfont {
+  font-size: 24rpx;
+  margin-right: 6rpx;
 }
-.post-list .post-item .info .meta .stats .stat:first-child::before {
+.stat .iconfont {
+  font-size: 24rpx;
+  margin-right: 6rpx;
+}
+.skeleton {
+  padding: 20rpx;
+}
+.skeleton-banner {
+  height: 320rpx;
+  background: #f0f0f0;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+}
+.skeleton-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+}
+.skeleton-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.skeleton-nav-item .skeleton-icon {
+  width: 90rpx;
+  height: 90rpx;
+  background: #f0f0f0;
+  border-radius: 50%;
+  margin-bottom: 16rpx;
+}
+.skeleton-nav-item .skeleton-text {
+  width: 60rpx;
+  height: 28rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+}
+.skeleton-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+.skeleton-header {
+  margin-bottom: 24rpx;
+}
+.skeleton-header .skeleton-title {
+  width: 200rpx;
+  height: 40rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+}
+.skeleton-tags {
+  display: flex;
+  overflow-x: scroll;
+}
+.skeleton-tags::-webkit-scrollbar {
   display: none;
+}
+.skeleton-tag {
+  flex-shrink: 0;
+  width: 260rpx;
+  height: 140rpx;
+  background: #f0f0f0;
+  border-radius: 16rpx;
+  margin-right: 24rpx;
+}
+.skeleton-tag:last-child {
+  margin-right: 0;
+}
+.skeleton-posts .skeleton-post {
+  display: flex;
+  margin-bottom: 30rpx;
+}
+.skeleton-posts .skeleton-post:last-child {
+  margin-bottom: 0;
+}
+.skeleton-posts .skeleton-cover {
+  width: 200rpx;
+  height: 150rpx;
+  background: #f0f0f0;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+}
+.skeleton-posts .skeleton-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.skeleton-posts .skeleton-post-title {
+  width: 80%;
+  height: 32rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+  margin-bottom: 16rpx;
+}
+.skeleton-posts .skeleton-post-desc {
+  width: 90%;
+  height: 24rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+  margin-bottom: 16rpx;
+}
+.skeleton-posts .skeleton-post-meta {
+  width: 60%;
+  height: 24rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+}
+@-webkit-keyframes fadeIn {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
+}
+@keyframes fadeIn {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
 }
 
