@@ -120,6 +120,17 @@ export default {
       this.isLoading = true;
 
       try {
+        // 检查网络状态
+        const networkType = await new Promise((resolve) => {
+          uni.getNetworkType({
+            success: (res) => resolve(res.networkType)
+          });
+        });
+
+        if (networkType === 'none') {
+          throw new Error('网络连接已断开');
+        }
+
         const res = await uniCloud.callFunction({
           name: "posts",
           data: {
@@ -140,19 +151,26 @@ export default {
             this.foodList = [...this.foodList, ...posts];
           }
 
-          // 打印检查数据
           console.log("加载的数据:", posts);
-
-          this.loadMoreStatus =
-            posts.length < this.pageSize ? "noMore" : "more";
+          this.loadMoreStatus = posts.length < this.pageSize ? "noMore" : "more";
         } else {
-          throw new Error(res.result.msg);
+          throw new Error(res.result.msg || '获取数据失败');
         }
       } catch (error) {
         console.error("获取美食列表失败:", error);
+        
+        // 显示更详细的错误信息
+        let errorMsg = "获取美食列表失败";
+        if (error.message.includes('无法连接uniCloud本地调试服务')) {
+          errorMsg = "请确保开发工具(HBuilderX)已启动，并且在同一网络环境下";
+        } else if (error.message.includes('网络连接已断开')) {
+          errorMsg = "网络连接已断开，请检查网络设置";
+        }
+        
         uni.showToast({
-          title: "获取美食列表失败",
+          title: errorMsg,
           icon: "none",
+          duration: 3000
         });
       } finally {
         this.isLoading = false;

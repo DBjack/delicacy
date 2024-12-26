@@ -1,0 +1,85 @@
+{
+	"bsonType": "object",
+	"required": ["nickname"],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": "doc._id == auth.uid || auth.role == 'admin'",
+		"delete": "doc._id == auth.uid || auth.role == 'admin'"
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"nickname": {
+			"bsonType": "string",
+			"description": "昵称",
+			"maxLength": 32
+		},
+		"avatar": {
+			"bsonType": "string",
+			"description": "头像",
+			"pattern": "^(http|https)://.+"
+		},
+		"bio": {
+			"bsonType": "string",
+			"description": "个人简介",
+			"maxLength": 200
+		},
+		"status": {
+			"bsonType": "int",
+			"description": "状态：0-禁用，1-正常",
+			"minimum": 0,
+			"maximum": 1,
+			"defaultValue": 1
+		},
+		"isExpert": {
+			"bsonType": "bool",
+			"description": "是否是达人",
+			"defaultValue": false
+		},
+		"verified": {
+			"bsonType": "bool",
+			"description": "是否认证",
+			"defaultValue": false
+		},
+		"recommendScore": {
+			"bsonType": "int",
+			"description": "推荐分数",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"followerCount": {
+			"bsonType": "int",
+			"description": "粉丝数",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"followingCount": {
+			"bsonType": "int",
+			"description": "关注数",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"likeCount": {
+			"bsonType": "int",
+			"description": "获赞数",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"createTime": {
+			"bsonType": "timestamp",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"updateTime": {
+			"bsonType": "timestamp",
+			"description": "更新时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+} 

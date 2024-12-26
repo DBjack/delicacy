@@ -1,0 +1,1 @@
+<view class="daily"><post-list vue-id="476b7435-1" posts="{{posts}}" data-event-opts="{{[['^refresh',[['loadData']]]]}}" bind:refresh="__e" bind:__l="__l"></post-list></view>

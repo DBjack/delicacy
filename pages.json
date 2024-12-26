@@ -8,7 +8,7 @@
 			}
 		},
 		{
-			"path": "pages/discover/discover",
+			"path": "pages/discover/index",
 			"style": {
 				"navigationBarTitleText": "发现",
 				"enablePullDownRefresh": true
@@ -115,6 +115,34 @@
 						"navigationBarTitleText": "帖子列表",
 						"enablePullDownRefresh": true
 					}
+				},
+				{
+					"path": "pages/daily/daily",
+					"style": {
+						"navigationBarTitleText": "每日推荐",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/ranking/ranking",
+					"style": {
+						"navigationBarTitleText": "排行榜",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/recipe/recipe",
+					"style": {
+						"navigationBarTitleText": "食谱",
+						"enablePullDownRefresh": true
+					}
+				},
+				{
+					"path": "pages/expert/expert",
+					"style": {
+						"navigationBarTitleText": "达人",
+						"enablePullDownRefresh": true
+					}
 				}
 			]
 		}
@@ -123,11 +151,11 @@
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "美食分享",
 		"navigationBarBackgroundColor": "#ffffff",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#f8f8f8"
 	},
 	"tabBar": {
 		"color": "#999999",
-		"selectedColor": "#ff6b6b",
+		"selectedColor": "#07c160",
 		"backgroundColor": "#ffffff",
 		"borderStyle": "black",
 		"list": [
@@ -138,7 +166,7 @@
 				"selectedIconPath": "static/tabbar/home-active.png"
 			},
 			{
-				"pagePath": "pages/discover/discover",
+				"pagePath": "pages/discover/index",
 				"text": "发现",
 				"iconPath": "static/tabbar/discover.png",
 				"selectedIconPath": "static/tabbar/discover-active.png"

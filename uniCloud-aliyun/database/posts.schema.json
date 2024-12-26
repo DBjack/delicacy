@@ -1,0 +1,95 @@
+{
+	"bsonType": "object",
+	"required": ["title", "content", "userId", "status"],
+	"permission": {
+		"read": true,
+		"create": "auth.uid != null",
+		"update": "doc.userId == auth.uid || auth.role == 'admin'",
+		"delete": "doc.userId == auth.uid || auth.role == 'admin'"
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"title": {
+			"bsonType": "string",
+			"description": "标题",
+			"maxLength": 100
+		},
+		"content": {
+			"bsonType": "string",
+			"description": "内容",
+			"maxLength": 10000
+		},
+		"cover": {
+			"bsonType": "string",
+			"description": "封面图片",
+			"pattern": "^(http|https)://.+"
+		},
+		"type": {
+			"bsonType": "string",
+			"description": "帖子类型",
+			"enum": ["normal", "recipe"],
+			"defaultValue": "normal"
+		},
+		"categoryId": {
+			"bsonType": "string",
+			"description": "分类ID，仅在type为recipe时有效"
+		},
+		"tags": {
+			"bsonType": "array",
+			"description": "标签ID数组",
+			"items": {
+				"bsonType": "string"
+			}
+		},
+		"userId": {
+			"bsonType": "string",
+			"description": "作者ID"
+		},
+		"status": {
+			"bsonType": "int",
+			"description": "状态：0-草稿，1-已发布，2-已删除",
+			"minimum": 0,
+			"maximum": 2,
+			"defaultValue": 0
+		},
+		"isRecommended": {
+			"bsonType": "bool",
+			"description": "是否推荐",
+			"defaultValue": false
+		},
+		"likes": {
+			"bsonType": "int",
+			"description": "点赞数",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"collections": {
+			"bsonType": "int",
+			"description": "收藏数",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"comments": {
+			"bsonType": "int",
+			"description": "评论数",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"createTime": {
+			"bsonType": "timestamp",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"updateTime": {
+			"bsonType": "timestamp",
+			"description": "更新时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+} 

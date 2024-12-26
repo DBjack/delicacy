@@ -1,0 +1,46 @@
+{
+	"bsonType": "object",
+	"required": ["name"],
+	"permission": {
+		"read": true,
+		"create": "auth.role == 'admin'",
+		"update": "auth.role == 'admin'",
+		"delete": "auth.role == 'admin'"
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"name": {
+			"bsonType": "string",
+			"description": "标签名称",
+			"maxLength": 20
+		},
+		"cover": {
+			"bsonType": "string",
+			"description": "封面图片",
+			"pattern": "^(http|https)://.+"
+		},
+		"status": {
+			"bsonType": "int",
+			"description": "状态：0-禁用，1-正常",
+			"minimum": 0,
+			"maximum": 1,
+			"defaultValue": 1
+		},
+		"createTime": {
+			"bsonType": "timestamp",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"updateTime": {
+			"bsonType": "timestamp",
+			"description": "更新时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+} 

@@ -1,32 +1,45 @@
 {
   "bsonType": "object",
-  "required": ["follower_uid", "following_uid"],
+  "required": ["userId", "followingId"],
   "permission": {
     "read": true,
     "create": "auth.uid != null",
-    "update": false,
-    "delete": "doc.follower_uid == auth.uid"
+    "update": "doc.userId == auth.uid",
+    "delete": "doc.userId == auth.uid"
   },
   "properties": {
     "_id": {
       "description": "ID，系统自动生成"
     },
-    "follower_uid": {
+    "userId": {
       "bsonType": "string",
-      "description": "关注者ID",
-      "foreignKey": "users._id"
+      "description": "关注者ID"
     },
-    "following_uid": {
+    "followingId": {
       "bsonType": "string",
-      "description": "被关注者ID",
-      "foreignKey": "users._id"
+      "description": "被关注者ID"
     },
-    "create_date": {
+    "createTime": {
       "bsonType": "timestamp",
       "description": "创建时间",
-      "defaultValue": {
+      "forceDefaultValue": {
         "$env": "now"
       }
     }
-  }
+  },
+  "indexes": [
+    {
+      "IndexName": "user_following",
+      "MgoKeySchema": {
+        "MgoIndexKeys": [{
+          "Name": "userId",
+          "Direction": "1"
+        }, {
+          "Name": "followingId",
+          "Direction": "1"
+        }],
+        "MgoIsUnique": true
+      }
+    }
+  ]
 } 

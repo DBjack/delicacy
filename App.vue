@@ -8,6 +8,17 @@ export default {
   onLaunch: function () {
     console.log("App Launch");
     this.checkLoginStatus();
+    
+    // 使用新的API获取系统信息
+    const systemInfo = wx.getWindowInfo();
+    const deviceInfo = wx.getDeviceInfo();
+    const appBaseInfo = wx.getAppBaseInfo();
+    
+    console.log('系统信息:', {
+      window: systemInfo,
+      device: deviceInfo,
+      app: appBaseInfo
+    });
   },
 
   onShow: function () {

@@ -1,378 +1,250 @@
 <template>
-  <view class="discover">
-    <view class="menu">
-      <view
-        v-for="(item, index) in menuList"
-        :key="index"
-        :class="['menu-item', { active: currentTab === index }]"
-        @tap="switchTab(index)"
-      >
-        {{ item.name }}
-      </view>
-    </view>
-
-    <swiper
-      class="content"
-      :current="currentTab"
-      @change="handleSwiperChange"
-      :style="{ height: contentHeight + 'px' }"
-    >
-      <!-- 推荐内容 -->
-      <swiper-item>
-        <scroll-view
-          scroll-y
-          class="scroll-view"
-          @scrolltolower="loadMore"
-          :refresher-enabled="true"
-          :refresher-triggered="isRefreshing"
-          @refresherrefresh="onRefresh"
-          :style="{ height: contentHeight + 'px' }"
-        >
-          <view class="post-list">
-            <view
-              v-for="(item, index) in postList"
-              :key="index"
-              class="post-item"
-              @tap="goToDetail(item._id)"
-            >
-              <image
-                v-if="item.cover"
-                :src="item.cover"
-                mode="aspectFill"
-                class="post-image"
-              />
-              <view class="post-info">
-                <text class="post-title">{{ item.title }}</text>
-                <text class="post-desc">{{ item.description }}</text>
-                <view class="post-meta">
-                  <view class="author">
-                    <image
-                      v-if="item.author.avatar"
-                      :src="item.author.avatar"
-                      mode="aspectFill"
-                      class="avatar"
-                    />
-                    <text class="nickname">{{ item.author.nickname }}</text>
-                  </view>
-                  <view class="stats">
-                    <text class="stat-item">{{ item.likes }} 赞</text>
-                    <text class="stat-item">{{ item.comments }} 评论</text>
-                  </view>
-                </view>
-              </view>
-            </view>
-          </view>
-          <view v-if="loading" class="loading">加载中...</view>
-          <view v-if="!hasMore" class="no-more">没有更多内容了</view>
-        </scroll-view>
-      </swiper-item>
-
-      <!-- 热门内容 -->
-      <swiper-item>
-        <scroll-view
-          scroll-y
-          class="scroll-view"
-          :style="{ height: contentHeight + 'px' }"
-        >
-          <view class="empty-content">
-            <text>敬请期待</text>
-          </view>
-        </scroll-view>
-      </swiper-item>
-
-      <!-- 关注内容 -->
-      <swiper-item>
-        <scroll-view
-          scroll-y
-          class="scroll-view"
-          :style="{ height: contentHeight + 'px' }"
-        >
-          <view class="empty-content">
-            <text>敬请期待</text>
-          </view>
-        </scroll-view>
-      </swiper-item>
-
-      <!-- 达人内容 -->
-      <swiper-item>
-        <scroll-view
-          scroll-y
-          class="scroll-view"
-          :style="{ height: contentHeight + 'px' }"
-        >
-          <view class="empty-content">
-            <text>敬请期待</text>
-          </view>
-        </scroll-view>
-      </swiper-item>
-    </swiper>
-  </view>
+	<view class="discover">
+		<view class="search-bar">
+			<view class="search-box" @tap="goSearch">
+				<text class="iconfont icon-search"></text>
+				<text class="placeholder">搜索美食、食谱、达人</text>
+			</view>
+		</view>
+		
+		<view class="nav-grid">
+			<view class="nav-item" @tap="goDaily">
+				<image class="icon" src="/static/icons/daily.png"></image>
+				<text class="name">每日推荐</text>
+			</view>
+			<view class="nav-item" @tap="goRanking">
+				<image class="icon" src="/static/icons/ranking.png"></image>
+				<text class="name">排行榜</text>
+			</view>
+			<view class="nav-item" @tap="goRecipe">
+				<image class="icon" src="/static/icons/recipe.png"></image>
+				<text class="name">食谱</text>
+			</view>
+			<view class="nav-item" @tap="goExpert">
+				<image class="icon" src="/static/icons/expert.png"></image>
+				<text class="name">达人</text>
+			</view>
+		</view>
+		
+		<view class="section">
+			<view class="section-header">
+				<text class="title">热门标签</text>
+				<text class="more" @tap="viewMoreTags">查看更多</text>
+			</view>
+			<scroll-view class="tag-scroll" scroll-x>
+				<view class="tag-list">
+					<view 
+						class="tag-item" 
+						v-for="(tag, index) in hotTags" 
+						:key="index"
+						@tap="selectTag(tag)"
+					>
+						<image class="cover" :src="tag.cover" mode="aspectFill"></image>
+						<text class="name">{{ tag.name }}</text>
+						<text class="count">{{ tag.count }}篇</text>
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+		
+		<view class="section">
+			<view class="section-header">
+				<text class="title">热门内容</text>
+				<text class="more" @tap="viewMorePosts">查看更多</text>
+			</view>
+			<post-list :posts="hotPosts" @refresh="loadData"></post-list>
+		</view>
+	</view>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      menuList: [
-        { name: "推荐" },
-        { name: "热门" },
-        { name: "关注" },
-        { name: "达人" },
-      ],
-      currentTab: 0,
-      postList: [],
-      page: 1,
-      pageSize: 10,
-      loading: false,
-      hasMore: true,
-      isRefreshing: false,
-      contentHeight: 0,
-    };
-  },
-
-  onLoad() {
-    this.loadPosts();
-    this.initContentHeight();
-  },
-
-  onReady() {
-    this.initContentHeight();
-  },
-
-  methods: {
-    initContentHeight() {
-      const systemInfo = uni.getSystemInfoSync();
-      // 减去菜单高度和状态栏高度
-      this.contentHeight = systemInfo.windowHeight - uni.upx2px(100);
-    },
-
-    async loadPosts(refresh = false) {
-      if (refresh) {
-        this.page = 1;
-        this.hasMore = true;
-        this.postList = [];
-      }
-
-      if (!this.hasMore || this.loading) return;
-
-      this.loading = true;
-      try {
-        // 添加环境信息日志
-        const systemInfo = uni.getSystemInfoSync();
-        console.log("系统信息:", systemInfo);
-
-        console.log("开始调用云函数...");
-        const callFunctionResult = await uniCloud
-          .callFunction({
-            name: "posts",
-            data: {
-              action: "getRecommendedPosts",
-              params: {
-                page: this.page,
-                pageSize: this.pageSize,
-              },
-            },
-            spaceId: "mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e",
-            provider: "aliyun",
-          })
-          .catch((err) => {
-            console.error("云函数调用出错:", err);
-            throw err;
-          });
-
-        console.log("云函数调用结果:", callFunctionResult);
-        const { result } = callFunctionResult;
-
-        if (result && result.data) {
-          const posts = result.data;
-          console.log("解析到的帖子数据:", posts);
-          if (posts.length > 0) {
-            this.postList = [...this.postList, ...posts];
-            this.page++;
-            console.log("更新后的帖子列表:", this.postList);
-          } else {
-            this.hasMore = false;
-            console.log("没有更多数据");
-          }
-        } else {
-          this.hasMore = false;
-          console.log("返回数据格式不正确:", result);
-        }
-      } catch (error) {
-        console.error("加载帖子失败:", error);
-        uni.showToast({
-          title: error.message || "加载失败",
-          icon: "none",
-          duration: 3000,
-        });
-      } finally {
-        this.loading = false;
-        if (this.isRefreshing) {
-          this.isRefreshing = false;
-        }
-      }
-    },
-
-    switchTab(index) {
-      this.currentTab = index;
-    },
-
-    handleSwiperChange(e) {
-      this.currentTab = e.detail.current;
-    },
-
-    loadMore() {
-      this.loadPosts();
-    },
-
-    async onRefresh() {
-      this.isRefreshing = true;
-      await this.loadPosts(true);
-    },
-
-    goToDetail(id) {
-      uni.navigateTo({
-        url: `/packagePost/pages/detail/detail?id=${id}`,
-      });
-    },
-  },
-};
+	export default {
+		data() {
+			return {
+				hotTags: [],
+				hotPosts: []
+			}
+		},
+		onLoad() {
+			this.loadData()
+		},
+		onPullDownRefresh() {
+			this.loadData()
+		},
+		methods: {
+			goSearch() {
+				uni.navigateTo({
+					url: '/pages/search/index'
+				})
+			},
+			goDaily() {
+				uni.navigateTo({
+					url: '/packagePost/pages/daily/daily'
+				})
+			},
+			goRanking() {
+				uni.navigateTo({
+					url: '/packagePost/pages/ranking/ranking'
+				})
+			},
+			goRecipe() {
+				uni.navigateTo({
+					url: '/packagePost/pages/recipe/recipe'
+				})
+			},
+			goExpert() {
+				uni.navigateTo({
+					url: '/packagePost/pages/expert/expert'
+				})
+			},
+			async loadData() {
+				try {
+					const { result } = await uniCloud.callFunction({
+						name: 'discover',
+						data: {
+							action: 'getDiscoverData'
+						}
+					})
+					this.hotTags = result.hotTags
+					this.hotPosts = result.hotPosts
+				} catch (e) {
+					uni.showToast({
+						title: '加载失败',
+						icon: 'none'
+					})
+				} finally {
+					uni.stopPullDownRefresh()
+				}
+			},
+			selectTag(tag) {
+				uni.navigateTo({
+					url: `/packagePost/pages/list/list?tag=${tag._id}`
+				})
+			},
+			viewMoreTags() {
+				uni.navigateTo({
+					url: '/pages/tag/list'
+				})
+			},
+			viewMorePosts() {
+				uni.navigateTo({
+					url: '/packagePost/pages/list/list?type=hot'
+				})
+			}
+		}
+	}
 </script>
 
 <style lang="scss">
 .discover {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #f8f8f8;
-
-  .menu {
-    display: flex;
-    padding: 20rpx;
-    background-color: #fff;
-    position: fixed;
-    top: var(--status-bar-height);
-    left: 0;
-    right: 0;
-    z-index: 1;
-    justify-content: space-around;
-    height: 100rpx;
-    box-sizing: border-box;
-
-    .menu-item {
-      padding: 10rpx 30rpx;
-      border-radius: 30rpx;
-      font-size: 28rpx;
-      color: #666;
-
-      &.active {
-        background-color: #007aff;
-        color: #fff;
-      }
-    }
-  }
-
-  .content {
-    flex: 1;
-    margin-top: calc(var(--status-bar-height) + 100rpx);
-    box-sizing: border-box;
-
-    .scroll-view {
-      box-sizing: border-box;
-    }
-
-    .post-list {
-      padding: 20rpx;
-
-      .post-item {
-        background-color: #fff;
-        border-radius: 12rpx;
-        margin-bottom: 20rpx;
-        overflow: hidden;
-
-        .post-image {
-          width: 100%;
-          height: 360rpx;
-        }
-
-        .post-info {
-          padding: 20rpx;
-
-          .post-title {
-            font-size: 32rpx;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10rpx;
-          }
-
-          .post-desc {
-            font-size: 28rpx;
-            color: #666;
-            margin-bottom: 20rpx;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            overflow: hidden;
-          }
-
-          .post-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .author {
-              display: flex;
-              align-items: center;
-
-              .avatar {
-                width: 40rpx;
-                height: 40rpx;
-                border-radius: 50%;
-                margin-right: 10rpx;
-              }
-
-              .nickname {
-                font-size: 24rpx;
-                color: #666;
-              }
-            }
-
-            .stats {
-              display: flex;
-
-              .stat-item {
-                font-size: 24rpx;
-                color: #999;
-                margin-left: 20rpx;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    .empty-content {
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #999;
-      font-size: 28rpx;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 20rpx;
-      color: #999;
-      font-size: 24rpx;
-    }
-
-    .no-more {
-      text-align: center;
-      padding: 20rpx;
-      color: #999;
-      font-size: 24rpx;
-    }
-  }
+	min-height: 100vh;
+	background-color: #f5f5f5;
+	
+	.search-bar {
+		background-color: #fff;
+		padding: 20rpx 30rpx;
+		
+		.search-box {
+			background-color: #f5f5f5;
+			height: 72rpx;
+			border-radius: 36rpx;
+			display: flex;
+			align-items: center;
+			padding: 0 30rpx;
+			
+			.icon-search {
+				font-size: 32rpx;
+				color: #999;
+				margin-right: 10rpx;
+			}
+			
+			.placeholder {
+				font-size: 28rpx;
+				color: #999;
+			}
+		}
+	}
+	
+	.nav-grid {
+		display: flex;
+		background-color: #fff;
+		padding: 30rpx;
+		
+		.nav-item {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			
+			.icon {
+				width: 80rpx;
+				height: 80rpx;
+				margin-bottom: 10rpx;
+			}
+			
+			.name {
+				font-size: 24rpx;
+				color: #333;
+			}
+		}
+	}
+	
+	.section {
+		margin-top: 20rpx;
+		background-color: #fff;
+		padding: 30rpx;
+		
+		.section-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20rpx;
+			
+			.title {
+				font-size: 32rpx;
+				color: #333;
+				font-weight: bold;
+			}
+			
+			.more {
+				font-size: 24rpx;
+				color: #666;
+			}
+		}
+		
+		.tag-scroll {
+			white-space: nowrap;
+			
+			.tag-list {
+				display: inline-flex;
+				padding: 10rpx 0;
+				
+				.tag-item {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					margin-right: 30rpx;
+					
+					.cover {
+						width: 160rpx;
+						height: 160rpx;
+						border-radius: 12rpx;
+						margin-bottom: 10rpx;
+					}
+					
+					.name {
+						font-size: 24rpx;
+						color: #333;
+						margin-bottom: 6rpx;
+					}
+					
+					.count {
+						font-size: 20rpx;
+						color: #999;
+					}
+				}
+			}
+		}
+	}
 }
 </style>

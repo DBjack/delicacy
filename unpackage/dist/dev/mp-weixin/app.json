@@ -1,7 +1,7 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/discover/discover",
+    "pages/discover/index",
     "pages/publish/publish",
     "pages/user/user",
     "pages/auth/login",
@@ -25,7 +25,11 @@
       "root": "packagePost",
       "pages": [
         "pages/detail/detail",
-        "pages/list/list"
+        "pages/list/list",
+        "pages/daily/daily",
+        "pages/ranking/ranking",
+        "pages/recipe/recipe",
+        "pages/expert/expert"
       ]
     }
   ],
@@ -33,11 +37,11 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "美食分享",
     "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#F8F8F8"
+    "backgroundColor": "#f8f8f8"
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#ff6b6b",
+    "selectedColor": "#07c160",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
@@ -48,7 +52,7 @@
         "selectedIconPath": "static/tabbar/home-active.png"
       },
       {
-        "pagePath": "pages/discover/discover",
+        "pagePath": "pages/discover/index",
         "text": "发现",
         "iconPath": "static/tabbar/discover.png",
         "selectedIconPath": "static/tabbar/discover-active.png"
@@ -73,6 +77,9 @@
   "permission": {
     "scope.userLocation": {
       "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    },
+    "scope.userInfo": {
+      "desc": "用于完善会员资料"
     }
   },
   "lazyCodeLoading": "requiredComponents",

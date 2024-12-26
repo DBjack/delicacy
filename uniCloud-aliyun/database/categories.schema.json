@@ -1,0 +1,52 @@
+{
+	"bsonType": "object",
+	"required": ["name"],
+	"permission": {
+		"read": true,
+		"create": "auth.role == 'admin'",
+		"update": "auth.role == 'admin'",
+		"delete": "auth.role == 'admin'"
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"name": {
+			"bsonType": "string",
+			"description": "分类名称",
+			"maxLength": 20
+		},
+		"icon": {
+			"bsonType": "string",
+			"description": "分类图标",
+			"pattern": "^(http|https)://.+"
+		},
+		"status": {
+			"bsonType": "int",
+			"description": "状态：0-禁用，1-正常",
+			"minimum": 0,
+			"maximum": 1,
+			"defaultValue": 1
+		},
+		"sort": {
+			"bsonType": "int",
+			"description": "排序，值越小越靠前",
+			"minimum": 0,
+			"defaultValue": 0
+		},
+		"createTime": {
+			"bsonType": "timestamp",
+			"description": "创建时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		},
+		"updateTime": {
+			"bsonType": "timestamp",
+			"description": "更新时间",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
+		}
+	}
+} 

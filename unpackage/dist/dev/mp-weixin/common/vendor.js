@@ -9466,9 +9466,9 @@ internalMixin(Vue);
 
 /***/ }),
 /* 26 */
-/*!******************************************************!*\
-  !*** D:/code/weChat/miniprogram/delicacy/pages.json ***!
-  \******************************************************/
+/*!***********************************!*\
+  !*** D:/code/delicacy/pages.json ***!
+  \***********************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -9951,7 +9951,7 @@ var S = "development" === "development",
   k = "true" === undefined || !0 === undefined,
   A = I([]),
   C = "h5" === b ? "web" : "app-plus" === b ? "app" : b,
-  P = I({"address":["127.0.0.1","172.23.192.1","172.21.224.1","172.22.112.1","192.168.11.109"],"servePort":7000,"debugPort":9000,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/software/HBuilderX/plugins/unicloud/**/*.js"]}),
+  P = I({"address":["127.0.0.1","192.168.1.13"],"servePort":7000,"debugPort":9000,"initialLaunchType":"local","skipFiles":["<node_internals>/**","D:/工作软件/HBuilderX/plugins/unicloud/**/*.js"]}),
   T = I([{"provider":"aliyun","spaceName":"delicacy-cloud","spaceId":"mp-3a16626b-b090-4f47-89ae-7c1ca7530d1e","clientSecret":"s8DmEaWFnpPY+4X3a2wlyA==","endpoint":"https://api.next.bspapp.com"}]) || [],
   x = true;
 var O = "";
@@ -17894,9 +17894,9 @@ module.exports = _isNativeFunction, module.exports.__esModule = true, module.exp
 
 /***/ }),
 /* 37 */
-/*!***********************************************************************************!*\
-  !*** D:/code/weChat/miniprogram/delicacy/pages.json?{"type":"origin-pages-json"} ***!
-  \***********************************************************************************/
+/*!****************************************************************!*\
+  !*** D:/code/delicacy/pages.json?{"type":"origin-pages-json"} ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17915,7 +17915,7 @@ var _default = {
       "enablePullDownRefresh": true
     }
   }, {
-    "path": "pages/discover/discover",
+    "path": "pages/discover/index",
     "style": {
       "navigationBarTitleText": "发现",
       "enablePullDownRefresh": true
@@ -18004,17 +18004,41 @@ var _default = {
         "navigationBarTitleText": "帖子列表",
         "enablePullDownRefresh": true
       }
+    }, {
+      "path": "pages/daily/daily",
+      "style": {
+        "navigationBarTitleText": "每日推荐",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/ranking/ranking",
+      "style": {
+        "navigationBarTitleText": "排行榜",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/recipe/recipe",
+      "style": {
+        "navigationBarTitleText": "食谱",
+        "enablePullDownRefresh": true
+      }
+    }, {
+      "path": "pages/expert/expert",
+      "style": {
+        "navigationBarTitleText": "达人",
+        "enablePullDownRefresh": true
+      }
     }]
   }],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "美食分享",
     "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#F8F8F8"
+    "backgroundColor": "#f8f8f8"
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#ff6b6b",
+    "selectedColor": "#07c160",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [{
@@ -18023,7 +18047,7 @@ var _default = {
       "iconPath": "static/tabbar/home.png",
       "selectedIconPath": "static/tabbar/home-active.png"
     }, {
-      "pagePath": "pages/discover/discover",
+      "pagePath": "pages/discover/index",
       "text": "发现",
       "iconPath": "static/tabbar/discover.png",
       "selectedIconPath": "static/tabbar/discover-active.png"
@@ -18044,9 +18068,9 @@ exports.default = _default;
 
 /***/ }),
 /* 38 */
-/*!**********************************************************************!*\
-  !*** D:/code/weChat/miniprogram/delicacy/pages.json?{"type":"stat"} ***!
-  \**********************************************************************/
+/*!***************************************************!*\
+  !*** D:/code/delicacy/pages.json?{"type":"stat"} ***!
+  \***************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
