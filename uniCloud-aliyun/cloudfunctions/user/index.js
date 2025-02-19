@@ -5,15 +5,21 @@ const $ = db.command.aggregate;
 const dbCmd = db.command;
 
 exports.main = async (event, context) => {
-  const { action, data = {} } = event;
+  const { action, data = {}, params = {} } = event;
 
   switch (action) {
+    case "login":
+      return await login(params);
     case "getExperts":
       return await getExperts(data);
     case "follow":
       return await follow(data);
     case "unfollow":
       return await unfollow(data);
+    case "uploadAvatar":
+      return await uploadAvatar(params);
+    case "updateProfile":
+      return await updateProfile(params);
     default:
       return {
         code: 404,
@@ -21,6 +27,93 @@ exports.main = async (event, context) => {
       };
   }
 };
+
+// 用户登录
+async function login(params) {
+  try {
+    const { code, userInfo } = params;
+    
+    if (!code || !userInfo) {
+      return {
+        code: 400,
+        msg: '参数不完整'
+      };
+    }
+    
+    // 获取微信用户openid
+    const { result: wxResult } = await uniCloud.callFunction({
+      name: 'common',
+      data: {
+        action: 'code2Session',
+        params: {
+          code
+        }
+      }
+    });
+    
+    if (wxResult.code !== 0 || !wxResult.data.openid) {
+      throw new Error('获取openid失败');
+    }
+    
+    const openid = wxResult.data.openid;
+    
+    // 查找或创建用户
+    const userCollection = db.collection('users');
+    let user = await userCollection.where({
+      openid
+    }).get();
+    
+    let userId;
+    
+    if (user.data && user.data.length > 0) {
+      // 更新用户信息
+      userId = user.data[0]._id;
+      await userCollection.doc(userId).update({
+        nickname: userInfo.nickName || userInfo.nickname,
+        avatar: userInfo.avatarUrl || userInfo.avatar,
+        updateTime: new Date()
+      });
+    } else {
+      // 创建新用户
+      const result = await userCollection.add({
+        openid,
+        nickname: userInfo.nickName || userInfo.nickname,
+        avatar: userInfo.avatarUrl || userInfo.avatar,
+        bio: '',
+        isExpert: false,
+        verified: false,
+        recommendScore: 0,
+        followerCount: 0,
+        followingCount: 0,
+        likeCount: 0,
+        status: 1,
+        createTime: new Date(),
+        updateTime: new Date()
+      });
+      userId = result.id;
+    }
+    
+    // 获取最新的用户信息
+    const userData = await userCollection.doc(userId).get();
+    
+    // 生成token（这里简单使用userId作为token，实际应该使用更安全的方式）
+    const token = userId;
+    
+    return {
+      code: 0,
+      msg: 'success',
+      data: {
+        ...userData.data[0],
+        token
+      }
+    };
+  } catch (e) {
+    return {
+      code: 500,
+      msg: e.message
+    };
+  }
+}
 
 // 获取达人列表
 async function getExperts(data) {
@@ -196,6 +289,77 @@ async function unfollow(data) {
     return {
       code: 500,
       msg: e.message,
+    };
+  }
+}
+
+// 上传头像
+async function uploadAvatar(params) {
+  try {
+    const { userId, avatar } = params;
+    
+    if (!userId || !avatar) {
+      return {
+        code: 400,
+        msg: '参数不完整'
+      };
+    }
+    
+    const result = await db.collection('users')
+      .doc(userId)
+      .update({
+        avatar,
+        updateTime: new Date()
+      });
+      
+    return {
+      code: 0,
+      msg: 'success',
+      data: {
+        avatar
+      }
+    };
+  } catch (e) {
+    return {
+      code: 500,
+      msg: e.message
+    };
+  }
+}
+
+// 更新用户资料
+async function updateProfile(params) {
+  try {
+    const { userId, profile } = params;
+    
+    if (!userId || !profile) {
+      return {
+        code: 400,
+        msg: '参数不完整'
+      };
+    }
+    
+    // 添加更新时间
+    profile.updateTime = new Date();
+    
+    await db.collection('users')
+      .doc(userId)
+      .update(profile);
+      
+    // 获取最新的用户信息
+    const userData = await db.collection('users')
+      .doc(userId)
+      .get();
+      
+    return {
+      code: 0,
+      msg: 'success',
+      data: userData.data[0]
+    };
+  } catch (e) {
+    return {
+      code: 500,
+      msg: e.message
     };
   }
 }

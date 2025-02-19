@@ -1,10 +1,10 @@
 {
 	"bsonType": "object",
-	"required": ["name"],
+	"required": ["name", "value"],
 	"permission": {
 		"read": true,
 		"create": "auth.role == 'admin'",
-		"update": "auth.role == 'admin'",
+		"update": "auth.role == 'admin' || auth.uid != null",
 		"delete": "auth.role == 'admin'"
 	},
 	"properties": {
@@ -15,6 +15,17 @@
 			"bsonType": "string",
 			"description": "标签名称",
 			"maxLength": 20
+		},
+		"value": {
+			"bsonType": "string",
+			"description": "标签值，用于系统识别",
+			"maxLength": 50
+		},
+		"useCount": {
+			"bsonType": "int",
+			"description": "使用次数",
+			"minimum": 0,
+			"defaultValue": 0
 		},
 		"cover": {
 			"bsonType": "string",

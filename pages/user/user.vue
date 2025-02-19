@@ -2,11 +2,7 @@
   <view class="container">
     <view class="user-header">
       <view class="bg-wrap">
-        <image
-          class="bg-image"
-          src="https://img.icons8.com/color/512/food-background.png"
-          mode="aspectFill"
-        />
+        <view class="bg-gradient"></view>
         <view class="bg-mask"></view>
       </view>
 
@@ -17,9 +13,7 @@
         >
           <image
             class="avatar"
-            :src="
-              userInfo.avatar || 'https://img.icons8.com/color/512/user.png'
-            "
+            :src="userInfo.avatar || '/static/logo.png'"
             mode="aspectFill"
           />
           <view class="edit-badge" v-if="isLogin">
@@ -30,7 +24,7 @@
         <view class="info-content" v-if="isLogin">
           <text class="nickname">{{ userInfo.nickname || "美食家" }}</text>
           <text class="signature">{{
-            userInfo.bio || "这个人很懒，什么都没写~"
+            userInfo.signature || "这个人很懒，什么都没写~"
           }}</text>
         </view>
         <text v-else class="login-btn" @tap="goToLogin">点击登录</text>
@@ -245,9 +239,23 @@ export default {
     height: 360rpx;
     overflow: hidden;
 
-    .bg-image {
+    .bg-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
+      background: linear-gradient(215deg, #ff6b6b, #ff8e8e, #ffd3d3);
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+      }
     }
 
     .bg-mask {
@@ -256,11 +264,7 @@ export default {
       right: 0;
       bottom: 0;
       height: 160rpx;
-      background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0),
-        rgba(0, 0, 0, 0.3)
-      );
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3));
     }
   }
 

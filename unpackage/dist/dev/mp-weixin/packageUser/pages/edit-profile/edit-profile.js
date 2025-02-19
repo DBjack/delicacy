@@ -157,10 +157,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ 28));
+var _slicedToArray2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ 5));
 var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ 31));
 var _defineProperty2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/helpers/defineProperty */ 11));
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -208,16 +215,22 @@ var _default = {
     };
   },
   onLoad: function onLoad() {
-    var userInfo = getApp().globalData.userInfo;
-    if (userInfo) {
-      this.userInfo = _objectSpread({}, userInfo);
+    var app = getApp();
+    var userInfo = app.globalData.userInfo;
+    console.log(userInfo, 'userInfo');
+    if (!userInfo || !userInfo._id) {
+      uni.navigateTo({
+        url: '/pages/auth/login'
+      });
+      return;
     }
+    this.userInfo = _objectSpread({}, userInfo);
   },
   methods: {
     chooseAvatar: function chooseAvatar() {
       var _this = this;
       return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee() {
-        var _yield$uni$chooseImag, tempFilePaths, result, _yield$uniCloud$callF, updateResult;
+        var _yield$uni$chooseImag, _yield$uni$chooseImag2, err, res, tempFilePath, uploadResult, _yield$uniCloud$callF, result, app, localUserInfo;
         return _regenerator.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -226,86 +239,117 @@ var _default = {
                 _context.next = 3;
                 return uni.chooseImage({
                   count: 1,
-                  sizeType: ["compressed"],
-                  sourceType: ["album", "camera"]
+                  sizeType: ['compressed'],
+                  sourceType: ['album', 'camera']
                 });
               case 3:
                 _yield$uni$chooseImag = _context.sent;
-                tempFilePaths = _yield$uni$chooseImag.tempFilePaths;
-                if (!(tempFilePaths && tempFilePaths.length > 0)) {
-                  _context.next = 21;
+                _yield$uni$chooseImag2 = (0, _slicedToArray2.default)(_yield$uni$chooseImag, 2);
+                err = _yield$uni$chooseImag2[0];
+                res = _yield$uni$chooseImag2[1];
+                if (!err) {
+                  _context.next = 9;
                   break;
                 }
+                throw new Error('选择图片失败');
+              case 9:
+                tempFilePath = res.tempFilePaths[0];
+                if (tempFilePath) {
+                  _context.next = 12;
+                  break;
+                }
+                throw new Error('未获取到图片');
+              case 12:
                 uni.showLoading({
-                  title: "上传中..."
+                  title: '上传中...',
+                  mask: true
                 });
 
                 // 上传图片到云存储
-                _context.next = 9;
+                _context.next = 15;
                 return uniCloud.uploadFile({
-                  filePath: tempFilePaths[0],
+                  filePath: tempFilePath,
                   cloudPath: "avatar/".concat(_this.userInfo._id, "_").concat(Date.now(), ".jpg")
                 });
-              case 9:
-                result = _context.sent;
-                if (!result.fileID) {
-                  _context.next = 21;
+              case 15:
+                uploadResult = _context.sent;
+                if (uploadResult.fileID) {
+                  _context.next = 18;
                   break;
                 }
-                _context.next = 13;
+                throw new Error('上传失败');
+              case 18:
+                _context.next = 20;
                 return uniCloud.callFunction({
-                  name: "user",
+                  name: 'user',
                   data: {
-                    action: "uploadAvatar",
+                    action: 'uploadAvatar',
                     params: {
                       userId: _this.userInfo._id,
-                      avatar: result.fileID
+                      avatar: uploadResult.fileID
                     }
                   }
                 });
-              case 13:
+              case 20:
                 _yield$uniCloud$callF = _context.sent;
-                updateResult = _yield$uniCloud$callF.result;
-                if (!(updateResult.code === 0)) {
-                  _context.next = 20;
+                result = _yield$uniCloud$callF.result;
+                if (!(result.code === 0)) {
+                  _context.next = 30;
                   break;
                 }
-                _this.userInfo.avatar = result.fileID;
+                _this.userInfo.avatar = uploadResult.fileID;
+
+                // 更新全局用户信息
+                app = getApp();
+                if (app.globalData.userInfo) {
+                  app.globalData.userInfo.avatar = uploadResult.fileID;
+                }
+
+                // 更新本地存储
+                try {
+                  localUserInfo = uni.getStorageSync('userInfo');
+                  if (localUserInfo) {
+                    localUserInfo.avatar = uploadResult.fileID;
+                    uni.setStorageSync('userInfo', localUserInfo);
+                  }
+                } catch (e) {
+                  console.error('更新本地存储失败:', e);
+                }
                 uni.showToast({
-                  title: "头像更新成功",
-                  icon: "success"
+                  title: '上传成功',
+                  icon: 'success'
                 });
-                _context.next = 21;
+                _context.next = 31;
                 break;
-              case 20:
-                throw new Error(updateResult.msg || "更新头像失败");
-              case 21:
-                _context.next = 27;
-                break;
-              case 23:
-                _context.prev = 23;
-                _context.t0 = _context["catch"](0);
-                console.error("上传头像失败:", _context.t0);
-                uni.showToast({
-                  title: _context.t0.message || "上传失败",
-                  icon: "none"
-                });
-              case 27:
-                _context.prev = 27;
-                uni.hideLoading();
-                return _context.finish(27);
               case 30:
+                throw new Error(result.msg || '更新头像失败');
+              case 31:
+                _context.next = 37;
+                break;
+              case 33:
+                _context.prev = 33;
+                _context.t0 = _context["catch"](0);
+                console.error('上传头像失败:', _context.t0);
+                uni.showToast({
+                  title: _context.t0.message || '上传失败',
+                  icon: 'none'
+                });
+              case 37:
+                _context.prev = 37;
+                uni.hideLoading();
+                return _context.finish(37);
+              case 40:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, null, [[0, 23, 27, 30]]);
+        }, _callee, null, [[0, 33, 37, 40]]);
       }))();
     },
     saveProfile: function saveProfile() {
       var _this2 = this;
       return (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2() {
-        var _yield$uniCloud$callF2, result;
+        var _yield$uniCloud$callF2, result, app, localUserInfo;
         return _regenerator.default.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -333,45 +377,66 @@ var _default = {
                 _yield$uniCloud$callF2 = _context2.sent;
                 result = _yield$uniCloud$callF2.result;
                 if (!(result.code === 0)) {
-                  _context2.next = 12;
+                  _context2.next = 14;
                   break;
                 }
                 // 更新全局用户信息
-                getApp().globalData.userInfo = _objectSpread({}, _this2.userInfo);
+                app = getApp();
+                app.globalData.userInfo = _objectSpread({}, _this2.userInfo);
+
+                // 更新本地存储
+                try {
+                  localUserInfo = uni.getStorageSync('userInfo');
+                  if (localUserInfo) {
+                    Object.assign(localUserInfo, {
+                      nickname: _this2.userInfo.nickname,
+                      avatar: _this2.userInfo.avatar,
+                      signature: _this2.userInfo.signature
+                    });
+                    uni.setStorageSync('userInfo', localUserInfo);
+                  }
+                } catch (e) {
+                  console.error('更新本地存储失败:', e);
+                }
                 uni.showToast({
                   title: "保存成功",
                   icon: "success"
                 });
 
-                // 返回上一页
+                // 返回上一页并刷新
                 setTimeout(function () {
+                  var pages = getCurrentPages();
+                  var prevPage = pages[pages.length - 2];
+                  if (prevPage) {
+                    prevPage.$vm.refreshUserInfo && prevPage.$vm.refreshUserInfo();
+                  }
                   uni.navigateBack();
                 }, 1500);
-                _context2.next = 13;
+                _context2.next = 15;
                 break;
-              case 12:
+              case 14:
                 throw new Error(result.msg || "保存失败");
-              case 13:
-                _context2.next = 19;
-                break;
               case 15:
-                _context2.prev = 15;
+                _context2.next = 21;
+                break;
+              case 17:
+                _context2.prev = 17;
                 _context2.t0 = _context2["catch"](0);
                 console.error("保存资料失败:", _context2.t0);
                 uni.showToast({
                   title: _context2.t0.message || "保存失败",
                   icon: "none"
                 });
-              case 19:
-                _context2.prev = 19;
+              case 21:
+                _context2.prev = 21;
                 uni.hideLoading();
-                return _context2.finish(19);
-              case 22:
+                return _context2.finish(21);
+              case 24:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, null, [[0, 15, 19, 22]]);
+        }, _callee2, null, [[0, 17, 21, 24]]);
       }))();
     }
   }

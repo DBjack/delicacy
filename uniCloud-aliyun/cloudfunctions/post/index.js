@@ -48,31 +48,91 @@ async function createPost(params) {
 				msg: '参数不完整'
 			};
 		}
-		
-		const postData = {
-			title,
-			content: description,
-			cover: images[0],
-			images,
-			category,
-			tags: tags || [],
-			userId: user_id,
-			status,
-			isRecommended: false,
-			likes: 0,
-			collections: 0,
-			comments: 0,
-			createTime: new Date(),
-			updateTime: new Date()
-		};
-		
-		const result = await db.collection('posts').add(postData);
-		
-		return {
-			code: 0,
-			msg: 'success',
-			data: result
-		};
+
+		try {
+			// 1. 创建帖子
+			const postData = {
+				title,
+				content: description,
+				cover: images[0],
+				images,
+				category,
+				tags: tags || [],
+				userId: user_id,
+				status,
+				isRecommended: false,
+				likes: 0,
+				collections: 0,
+				comments: 0,
+				createTime: new Date(),
+				updateTime: new Date()
+			};
+			
+			// 2. 预处理标签 - 查询已存在的标签
+			let existingTags = [];
+			let tagResult = { data: [] };
+			if (tags && tags.length > 0) {
+				tagResult = await db.collection('tags')
+					.where({
+						value: dbCmd.in(tags)
+					})
+					.get();
+				existingTags = tagResult.data.map(tag => tag.value);
+			}
+			
+			// 3. 开始事务处理
+			const transaction = await db.startTransaction();
+			
+			try {
+				// 3.1 创建帖子
+				const postResult = await transaction.collection('posts').add(postData);
+				
+				// 3.2 处理标签
+				if (tags && tags.length > 0) {
+					// 更新已存在的标签
+					for (const tag of existingTags) {
+						const tagDoc = tagResult.data.find(t => t.value === tag);
+						if (tagDoc) {
+							await transaction.collection('tags')
+								.doc(tagDoc._id)
+								.update({
+									useCount: dbCmd.inc(1),
+									updateTime: new Date()
+								});
+						}
+					}
+					
+					// 创建新标签
+					const newTags = tags.filter(tag => !existingTags.includes(tag));
+					for (const tag of newTags) {
+						await transaction.collection('tags').add({
+							name: tag,
+							value: tag,
+							useCount: 1,
+							status: 1,
+							createTime: new Date(),
+							updateTime: new Date()
+						});
+					}
+				}
+				
+				await transaction.commit();
+				
+				return {
+					code: 0,
+					msg: 'success',
+					data: postResult
+				};
+			} catch (err) {
+				await transaction.rollback();
+				throw err;
+			}
+		} catch (e) {
+			return {
+				code: 500,
+				msg: e.message
+			};
+		}
 	} catch (e) {
 		return {
 			code: 500,
